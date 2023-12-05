@@ -1,0 +1,29 @@
+version: '3.5'
+name: "todo"
+
+services:
+  app:
+    ports:
+      - "11000:11000"
+    env_file:
+      - ../config/.env
+    build:
+      context: ./..
+      dockerfile: deployment/auth/Dockerfile
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2G"
+        max-file: "1"
+
+  migrations:
+    build:
+      context: ./..
+      dockerfile: deployment/migration/Dockerfile
+    env_file:
+      - ../config/.env
+
+volumes:
+  postgres:
+    driver: local
