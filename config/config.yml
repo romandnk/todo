@@ -1,0 +1,10 @@
+zap_logger:
+  test: true
+  level: "debug"
+  output_paths: ["stdout"]
+  error_output_paths: ["stderr"]
+
+postgres:
+  ssl_mode: "disable"
+  max_conns: 5
+  min_conns: 3
