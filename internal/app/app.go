@@ -3,7 +3,9 @@ package app
 import (
 	"context"
 	"github.com/romandnk/todo/config"
+	zaplogger "github.com/romandnk/todo/pkg/logger/zap"
 	postgres "github.com/romandnk/todo/pkg/storage"
+	"go.uber.org/zap"
 	"log"
 	"os/signal"
 	"syscall"
