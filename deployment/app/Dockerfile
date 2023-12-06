@@ -1,15 +1,12 @@
-FROM golang:1.21.4 as build
+FROM golang:1.21.3 as build
 
 WORKDIR /app
 
 COPY . .
 RUN go mod download
 
-ARG BUILD_VERSION
-
-RUN CGO_ENABLED=0 GOOS=linux go build -v -o ./bin/app \
-    -ldflags "-X main.release=$BUILD_VERSION -X main.buildDate=$(date -u +%Y-%m-%dT%H:%M:%S) -X main.gitHash=$(git log --format="%h" -n 1)" \
-    ./cmd/app
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -o ./bin/app ./cmd/app
+RUN chmod a+x /app/bin/app
 
 FROM scratch
 
