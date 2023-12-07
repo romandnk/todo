@@ -43,17 +43,16 @@ func (r *TaskRepo) GetTaskByID(ctx context.Context, id int) (entity.Task, error)
 
 	query := fmt.Sprintf(`
 		SELECT 
-		    t.id, 
-		    t.title, 
-		    t.description, 
-		    s.name, 
-		    t.date, 
-		    t.deleted, 
-		    t.created_at, 
-		    t.deleted_at
-		FROM %[1]s t
-		JOIN %[2]s s ON t.status_id=s.id
-		WHERE t.id=$1 AND deleted=false
+		    id, 
+		    title, 
+		    description, 
+		    status_id, 
+		    date, 
+		    deleted, 
+		    created_at, 
+		    deleted_at
+		FROM %[1]s
+		WHERE id=$1
 	`, constant.TasksTable, constant.StatusesTable)
 
 	err := pgxscan.Get(ctx, r.db, &task, query, id)
@@ -62,32 +61,6 @@ func (r *TaskRepo) GetTaskByID(ctx context.Context, id int) (entity.Task, error)
 	}
 
 	return task, nil
-}
-
-func (r *TaskRepo) GetTasksByTitle(ctx context.Context, title string) ([]*entity.Task, error) {
-	var tasks []*entity.Task
-
-	query := fmt.Sprintf(`
-		SELECT 
-		    t.id, 
-		    t.title, 
-		    t.description, 
-		    s.name, 
-		    t.date, 
-		    t.deleted, 
-		    t.created_at, 
-		    t.deleted_at
-		FROM %[1]s t
-		JOIN %[2]s s ON t.status_id=s.id
-		WHERE t.title LIKE '%$1%' AND deleted=false
-	`, constant.TasksTable, constant.StatusesTable)
-
-	err := pgxscan.Select(ctx, r.db, &tasks, query, title)
-	if err != nil {
-		return tasks, err
-	}
-
-	return tasks, nil
 }
 
 func (r *TaskRepo) UpdateTaskByID(ctx context.Context, id int, task entity.Task) error {
@@ -104,9 +77,13 @@ func (r *TaskRepo) UpdateTaskByID(ctx context.Context, id int, task entity.Task)
 		WHERE id=$5 AND deleted=false
 	`, constant.TasksTable)
 
-	_, err := r.db.Exec(ctx, query, values...)
+	res, err := r.db.Exec(ctx, query, values...)
 	if err != nil {
 		return err
+	}
+
+	if res.RowsAffected() == 0 {
+		return constant.ErrTaskIDNotExists
 	}
 
 	return nil

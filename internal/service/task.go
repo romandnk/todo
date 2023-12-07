@@ -113,3 +113,100 @@ func (s *taskService) DeleteTaskByID(ctx context.Context, stringID string) error
 
 	return nil
 }
+
+func (s *taskService) UpdateTaskByID(ctx context.Context, stringID string, params UpdateTaskByIDParams) error {
+	if stringID == "" {
+		return constant.ErrEmptyTaskID
+	}
+	id, err := strconv.Atoi(stringID)
+	if err != nil {
+		s.logger.Error("error converting string task id to int task id", zap.Error(err))
+		return constant.ErrInvalidTaskID
+	}
+
+	params.Title = strings.TrimSpace(params.Title)
+	params.Description = strings.TrimSpace(params.Description)
+	params.StatusName = strings.TrimSpace(params.StatusName)
+	var status entity.Status
+	if params.StatusName != "" {
+		status, err = s.status.GetStatusByName(ctx, params.StatusName)
+		if err != nil {
+			s.logger.Error("error getting repo status by name", zap.Error(err))
+			if errors.Is(err, pgx.ErrNoRows) {
+				return errors.New(fmt.Sprintf("status name '%s' is not found", params.StatusName))
+			}
+			return constant.ErrInternalError
+		}
+	}
+
+	params.Date = strings.TrimSpace(params.Date)
+
+	date, err := time.Parse(time.RFC3339, params.Date)
+	if err != nil {
+		s.logger.Error("error parsing date", zap.Error(err))
+		return constant.ErrInvalidDateFormat
+	}
+	now := time.Now().UTC()
+	if date.UTC().Before(now) {
+		return constant.ErrOutdatedDate
+	}
+
+	task := entity.Task{
+		Title:       params.Title,
+		Description: params.Description,
+		StatusID:    status.ID,
+		Date:        date,
+	}
+	err = s.task.UpdateTaskByID(ctx, id, task)
+	if err != nil {
+		if errors.Is(err, constant.ErrTaskIDNotExists) {
+			return err
+		}
+		s.logger.Error("error updating repo task by id", zap.Error(err))
+		return constant.ErrInternalError
+	}
+
+	return nil
+}
+
+func (s *taskService) GetTaskByID(ctx context.Context, stringID string) (GetTaskWithStatusNameModel, error) {
+	var response GetTaskWithStatusNameModel
+
+	if stringID == "" {
+		return response, constant.ErrEmptyTaskID
+	}
+	id, err := strconv.Atoi(stringID)
+	if err != nil {
+		s.logger.Error("error converting string task id to int task id", zap.Error(err))
+		return response, constant.ErrInvalidTaskID
+	}
+
+	task, err := s.task.GetTaskByID(ctx, id)
+	if err != nil {
+		s.logger.Error("error getting repo task by id", zap.Error(err))
+		if errors.Is(err, pgx.ErrNoRows) {
+			return response, errors.New(fmt.Sprintf("task with id '%d' is not found", id))
+		}
+		return response, constant.ErrInternalError
+	}
+
+	status, err := s.status.GetStatusByID(ctx, task.StatusID)
+	if err != nil {
+		s.logger.Error("error getting repo status by id", zap.Error(err))
+		if errors.Is(err, pgx.ErrNoRows) {
+			return response, errors.New(fmt.Sprintf("status id '%d' is not found", task.StatusID))
+		}
+		return response, constant.ErrInternalError
+	}
+
+	response.ID = task.ID
+	response.Title = task.Title
+	response.Description = task.Description
+	response.Date = task.Date.Format(time.RFC3339)
+	response.StatusName = status.Name
+	response.Deleted = task.Deleted
+	response.CreatedAt = task.CreatedAt.Format(time.RFC3339)
+	response.DeletedAt = task.DeletedAt.Format(time.RFC3339)
+
+	return response, nil
+}

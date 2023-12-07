@@ -53,3 +53,20 @@ func (r *StatusRepo) GetStatusByName(ctx context.Context, name string) (entity.S
 
 	return status, nil
 }
+
+func (r *StatusRepo) GetStatusByID(ctx context.Context, id int) (entity.Status, error) {
+	var status entity.Status
+
+	query := fmt.Sprintf(`
+		SELECT id, name
+		FROM %[1]s
+		WHERE id=$1
+	`, constant.StatusesTable)
+
+	err := pgxscan.Get(ctx, r.db, &status, query, id)
+	if err != nil {
+		return status, err
+	}
+
+	return status, nil
+}

@@ -95,10 +95,72 @@ func (r *taskRoutes) DeleteTaskByID(ctx *gin.Context) {
 	return
 }
 
+// UpdateTaskByID
+//
+//	@Summary		UpdateTaskByID
+//	@Description	Update task selected fields by its id.
+//	@UUID			202
+//	@Param			params	path		int								true	"Required task id to update"
+//	@Param			params	body		service.UpdateTaskByIDParams	true	"Required JSON body with necessary fields to update"
+//	@Success		200		{object}	nil								"Task was updated successfully"
+//	@Failure		400		{object}	response						"Invalid input data"
+//	@Failure		500		{object}	response						"Internal error"
+//	@Router			/tasks/:id [patch]
+//	@Tags			Task
 func (r *taskRoutes) UpdateTaskByID(ctx *gin.Context) {
+	var params service.UpdateTaskByIDParams
 
+	if err := ctx.ShouldBindJSON(&params); err != nil {
+		r.logger.Error("error binding json body", zap.Error(err))
+		sentErrorResponse(ctx, http.StatusBadRequest, "error binding json body", err)
+		return
+	}
+
+	id := ctx.Param("id")
+
+	err := r.task.UpdateTaskByID(ctx, id, params)
+	if err != nil {
+		code := http.StatusBadRequest
+		if errors.Is(err, constant.ErrInternalError) {
+			code = http.StatusInternalServerError
+		}
+		r.logger.Error("error updating task by id",
+			zap.Error(err),
+			zap.String("task id", id))
+		sentErrorResponse(ctx, code, "error updating task by id", err)
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+	return
 }
 
+// GetTaskByID
+//
+//	@Summary		GetTaskByID
+//	@Description	Get task by its id.
+//	@UUID			203
+//	@Param			params	path		int			true	"Required task id to get"
+//	@Success		200		{object}	nil			"Task was updated successfully"
+//	@Failure		400		{object}	response	"Invalid input data"
+//	@Failure		500		{object}	response	"Internal error"
+//	@Router			/tasks/:id [get]
+//	@Tags			Task
 func (r *taskRoutes) GetTaskByID(ctx *gin.Context) {
+	id := ctx.Param("id")
 
+	resp, err := r.task.GetTaskByID(ctx, id)
+	if err != nil {
+		code := http.StatusBadRequest
+		if errors.Is(err, constant.ErrInternalError) {
+			code = http.StatusInternalServerError
+		}
+		r.logger.Error("error getting task by id",
+			zap.Error(err),
+			zap.String("task id", id))
+		sentErrorResponse(ctx, code, "error getting task by id", err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, resp)
 }

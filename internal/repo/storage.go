@@ -10,7 +10,6 @@ import (
 type Task interface {
 	CreateTask(ctx context.Context, task entity.Task) (int, error)
 	GetTaskByID(ctx context.Context, id int) (entity.Task, error)
-	GetTasksByTitle(ctx context.Context, title string) ([]*entity.Task, error)
 	UpdateTaskByID(ctx context.Context, id int, task entity.Task) error
 	DeleteTaskByID(ctx context.Context, id int) error
 }
@@ -18,6 +17,7 @@ type Task interface {
 type Status interface {
 	CreateStatus(ctx context.Context, status entity.Status) (int, error)
 	GetStatusByName(ctx context.Context, name string) (entity.Status, error)
+	GetStatusByID(ctx context.Context, id int) (entity.Status, error)
 }
 
 type Repository struct {

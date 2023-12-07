@@ -103,6 +103,39 @@ const docTemplate = `{
             }
         },
         "/tasks/:id": {
+            "get": {
+                "description": "Get task by its id.",
+                "tags": [
+                    "Task"
+                ],
+                "summary": "GetTaskByID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Required task id to get",
+                        "name": "params",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Task was updated successfully"
+                    },
+                    "400": {
+                        "description": "Invalid input data",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            },
             "delete": {
                 "description": "Delete task by its id.",
                 "tags": [
@@ -121,6 +154,48 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "Task was deleted successfully"
+                    },
+                    "400": {
+                        "description": "Invalid input data",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Update task selected fields by its id.",
+                "tags": [
+                    "Task"
+                ],
+                "summary": "UpdateTaskByID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Required task id to update",
+                        "name": "params",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Required JSON body with necessary fields to update",
+                        "name": "params",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/service.UpdateTaskByIDParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Task was updated successfully"
                     },
                     "400": {
                         "description": "Invalid input data",
@@ -186,6 +261,23 @@ const docTemplate = `{
             "properties": {
                 "id": {
                     "type": "integer"
+                }
+            }
+        },
+        "service.UpdateTaskByIDParams": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "status_name": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
                 }
             }
         },

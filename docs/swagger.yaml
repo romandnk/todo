@@ -33,6 +33,17 @@ definitions:
       id:
         type: integer
     type: object
+  service.UpdateTaskByIDParams:
+    properties:
+      date:
+        type: string
+      description:
+        type: string
+      status_name:
+        type: string
+      title:
+        type: string
+    type: object
   v1.response:
     properties:
       error:
@@ -124,6 +135,56 @@ paths:
           schema:
             $ref: '#/definitions/v1.response'
       summary: DeleteTaskByID
+      tags:
+      - Task
+    get:
+      description: Get task by its id.
+      parameters:
+      - description: Required task id to get
+        in: path
+        name: params
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: Task was updated successfully
+        "400":
+          description: Invalid input data
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: GetTaskByID
+      tags:
+      - Task
+    patch:
+      description: Update task selected fields by its id.
+      parameters:
+      - description: Required task id to update
+        in: path
+        name: params
+        required: true
+        type: integer
+      - description: Required JSON body with necessary fields to update
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/service.UpdateTaskByIDParams'
+      responses:
+        "200":
+          description: Task was updated successfully
+        "400":
+          description: Invalid input data
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: UpdateTaskByID
       tags:
       - Task
 swagger: "2.0"

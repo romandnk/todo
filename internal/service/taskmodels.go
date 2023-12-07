@@ -11,6 +11,20 @@ type CreateTaskResponse struct {
 	ID int `json:"id"`
 }
 
-type DeleteTaskParams struct {
-	ID string `json:"id"`
+type UpdateTaskByIDParams struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	StatusName  string `json:"status_name"`
+	Date        string `json:"date"`
+}
+
+type GetTaskWithStatusNameModel struct {
+	ID          int    `json:"id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	StatusName  string `json:"status_name"`
+	Date        string `json:"date"`
+	Deleted     bool   `json:"deleted"`
+	CreatedAt   string `json:"created_at"`
+	DeletedAt   string `json:"deleted_at"`
 }
