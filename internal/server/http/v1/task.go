@@ -140,10 +140,10 @@ func (r *taskRoutes) UpdateTaskByID(ctx *gin.Context) {
 //	@Summary		GetTaskByID
 //	@Description	Get task by its id.
 //	@UUID			203
-//	@Param			params	path		int			true	"Required task id to get"
-//	@Success		200		{object}	nil			"Task was updated successfully"
-//	@Failure		400		{object}	response	"Invalid input data"
-//	@Failure		500		{object}	response	"Internal error"
+//	@Param			params	path		int							true	"Required task id to get"
+//	@Success		200		{object}	GetTaskWithStatusNameModel	"Task was gotten successfully"
+//	@Failure		400		{object}	response					"Invalid input data"
+//	@Failure		500		{object}	response					"Internal error"
 //	@Router			/tasks/:id [get]
 //	@Tags			Task
 func (r *taskRoutes) GetTaskByID(ctx *gin.Context) {
