@@ -2,6 +2,7 @@ package v1
 
 import (
 	"github.com/gin-gonic/gin"
+	docs "github.com/romandnk/todo/docs"
 	"github.com/romandnk/todo/internal/service"
 	"github.com/romandnk/todo/pkg/logger"
 	swaggerfiles "github.com/swaggo/files"
@@ -28,6 +29,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 	h.engine = router
 
+	docs.SwaggerInfo.BasePath = "/api/v1"
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	api := router.Group("/api/v1", h.mw.Logging())
