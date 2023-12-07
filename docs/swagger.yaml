@@ -1,0 +1,45 @@
+basePath: /api/v1/
+definitions:
+  service.CreateStatusResponse:
+    properties:
+      id:
+        type: integer
+    type: object
+  v1.response:
+    properties:
+      error:
+        type: string
+      message:
+        type: string
+    type: object
+info:
+  contact:
+    name: API [Roman] Support
+  description: Swagger API for Golang Project TODO.
+  license:
+    name: romandnk
+    url: https://github.com/romandnk/todo
+  termsOfService: http://swagger.io/terms/
+  title: TODO App Swagger
+  version: "1.0"
+paths:
+  /statuses/:
+    post:
+      description: Create new task status.
+      responses:
+        "200":
+          description: Status was created successfully
+          schema:
+            $ref: '#/definitions/service.CreateStatusResponse'
+        "400":
+          description: Invalid input data
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: CreateStatus
+      tags:
+      - status_handler
+swagger: "2.0"

@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/ilyakaznacheev/cleanenv"
 )
@@ -9,8 +10,9 @@ import (
 const configPath string = "./config/config.yml"
 
 type Config struct {
-	ZapLogger ZapLogger `yaml:"zap_logger"`
-	Postgres  Postgres  `yaml:"postgres"`
+	ZapLogger  ZapLogger  `yaml:"zap_logger"`
+	Postgres   Postgres   `yaml:"postgres"`
+	HTTPServer HTTPServer `json:"http_server"`
 }
 
 type ZapLogger struct {
@@ -29,6 +31,14 @@ type Postgres struct {
 	SSLMode  string `yaml:"ssl_mode" env:"POSTGRES_SSLMODE" env-default:"disable"`
 	MaxConns int32  `yaml:"max_conns"`
 	MinConns int32  `yaml:"min_conns"`
+}
+
+type HTTPServer struct {
+	Host            string        `env:"HTTP_SERVER_HOST" env-default:"localhost"`
+	Port            int           `env:"HTTP_SERVER_PORT" env-default:"8080"`
+	ReadTimeout     time.Duration `yaml:"read_timeout" env-default:"5s"`
+	WriteTimeout    time.Duration `yaml:"write_timeout" env-default:"5s"`
+	ShutdownTimeout time.Duration `yaml:"shutdown_timeout" env-default:"5s"`
 }
 
 func NewConfig() (*Config, error) {

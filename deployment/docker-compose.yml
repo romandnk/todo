@@ -30,7 +30,7 @@ services:
 
   app:
     ports:
-      - "11000:11000"
+      - "8080:8080"
     env_file:
       - ../config/.env
     build:
@@ -42,11 +42,11 @@ services:
         condition: service_healthy
       migrations:
         condition: service_completed_successfully
-#    logging:
-#      driver: "json-file"
-#      options:
-#        max-size: "2G"
-#        max-file: "1"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2G"
+        max-file: "1"
     networks:
       todo-network:
 

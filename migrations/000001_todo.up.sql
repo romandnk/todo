@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS statuses (
     id SMALLSERIAL PRIMARY KEY,
-    name VARCHAR(36) NOT NULL
+    name VARCHAR(36) UNIQUE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS tasks (
@@ -11,7 +11,12 @@ CREATE TABLE IF NOT EXISTS tasks (
     date TIMESTAMPTZ NOT NULL,
     deleted BOOLEAN NOT NULL,
     created_at TIMESTAMPTZ NOT NULL,
-    deleted_at TIMESTAMPTZ NOT NULL,
+    deleted_at TIMESTAMPTZ,
     FOREIGN KEY (status_id) REFERENCES statuses (id)
 );
+
+INSERT INTO statuses (name)
+VALUES
+    ('Выполнено'),
+    ('Не выполнено');
 

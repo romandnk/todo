@@ -8,3 +8,8 @@ postgres:
   ssl_mode: "disable"
   max_conns: 5
   min_conns: 3
+
+http_server:
+  read_timeout: "5s"
+  write_timeout: "5s"
+  shutdown_timeout: "5s"
