@@ -33,6 +33,25 @@ definitions:
       id:
         type: integer
     type: object
+  service.GetTaskWithStatusNameModel:
+    properties:
+      created_at:
+        type: string
+      date:
+        type: string
+      deleted:
+        type: boolean
+      deleted_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      status_name:
+        type: string
+      title:
+        type: string
+    type: object
   service.UpdateTaskByIDParams:
     properties:
       date:
@@ -118,7 +137,7 @@ paths:
     delete:
       description: Delete task by its id.
       parameters:
-      - description: Required task id to delete
+      - description: Required task id for deleting
         in: path
         name: params
         required: true
@@ -140,14 +159,16 @@ paths:
     get:
       description: Get task by its id.
       parameters:
-      - description: Required task id to get
+      - description: Required task id for getting
         in: path
         name: params
         required: true
         type: integer
       responses:
         "200":
-          description: Task was updated successfully
+          description: Task was gotten successfully
+          schema:
+            $ref: '#/definitions/service.GetTaskWithStatusNameModel'
         "400":
           description: Invalid input data
           schema:
@@ -162,7 +183,7 @@ paths:
     patch:
       description: Update task selected fields by its id.
       parameters:
-      - description: Required task id to update
+      - description: Required task id for updating
         in: path
         name: params
         required: true

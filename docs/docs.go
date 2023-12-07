@@ -112,7 +112,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Required task id to get",
+                        "description": "Required task id for getting",
                         "name": "params",
                         "in": "path",
                         "required": true
@@ -120,7 +120,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Task was updated successfully"
+                        "description": "Task was gotten successfully",
+                        "schema": {
+                            "$ref": "#/definitions/service.GetTaskWithStatusNameModel"
+                        }
                     },
                     "400": {
                         "description": "Invalid input data",
@@ -145,7 +148,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Required task id to delete",
+                        "description": "Required task id for deleting",
                         "name": "params",
                         "in": "path",
                         "required": true
@@ -178,7 +181,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Required task id to update",
+                        "description": "Required task id for updating",
                         "name": "params",
                         "in": "path",
                         "required": true
@@ -261,6 +264,35 @@ const docTemplate = `{
             "properties": {
                 "id": {
                     "type": "integer"
+                }
+            }
+        },
+        "service.GetTaskWithStatusNameModel": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "deleted": {
+                    "type": "boolean"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "status_name": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
                 }
             }
         },

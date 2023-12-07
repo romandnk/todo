@@ -16,15 +16,13 @@ var (
 
 // task service errors
 var (
-	// create task errors
 	ErrEmptyTitle        = errors.New("title cannot be empty")
 	ErrEmptyDescription  = errors.New("description cannot be empty")
 	ErrTooLongTitle      = errors.New("max task title length is 64")
 	ErrEmptyDate         = errors.New("date cannot be empty")
 	ErrInvalidDateFormat = errors.New("date must be in RFC3339 format")
 	ErrOutdatedDate      = errors.New("you cannot set task date on the past")
-
-	// delete task by id errors
-	ErrEmptyTaskID   = errors.New("task id cannot be empty")
-	ErrInvalidTaskID = errors.New("task id must be int")
+	ErrEmptyTaskID       = errors.New("task id cannot be empty")
+	ErrInvalidTaskID     = errors.New("task id must be int")
+	ErrNonPositiveTaskID = errors.New("task id must be positive")
 )

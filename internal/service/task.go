@@ -102,10 +102,14 @@ func (s *taskService) DeleteTaskByID(ctx context.Context, stringID string) error
 		return constant.ErrInvalidTaskID
 	}
 
+	if id <= 0 {
+		return constant.ErrNonPositiveTaskID
+	}
+
 	err = s.task.DeleteTaskByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, constant.ErrTaskIDNotExists) {
-			return err
+			return errors.New(fmt.Sprintf("%s %d", err.Error(), id))
 		}
 		s.logger.Error("error deleting repo task by id", zap.Error(err))
 		return constant.ErrInternalError
@@ -124,6 +128,10 @@ func (s *taskService) UpdateTaskByID(ctx context.Context, stringID string, param
 		return constant.ErrInvalidTaskID
 	}
 
+	if id <= 0 {
+		return constant.ErrNonPositiveTaskID
+	}
+
 	params.Title = strings.TrimSpace(params.Title)
 	params.Description = strings.TrimSpace(params.Description)
 	params.StatusName = strings.TrimSpace(params.StatusName)
@@ -139,16 +147,18 @@ func (s *taskService) UpdateTaskByID(ctx context.Context, stringID string, param
 		}
 	}
 
+	var date time.Time
 	params.Date = strings.TrimSpace(params.Date)
-
-	date, err := time.Parse(time.RFC3339, params.Date)
-	if err != nil {
-		s.logger.Error("error parsing date", zap.Error(err))
-		return constant.ErrInvalidDateFormat
-	}
-	now := time.Now().UTC()
-	if date.UTC().Before(now) {
-		return constant.ErrOutdatedDate
+	if params.Date != "" {
+		date, err = time.Parse(time.RFC3339, params.Date)
+		if err != nil {
+			s.logger.Error("error parsing date", zap.Error(err))
+			return constant.ErrInvalidDateFormat
+		}
+		now := time.Now().UTC()
+		if date.UTC().Before(now) {
+			return constant.ErrOutdatedDate
+		}
 	}
 
 	task := entity.Task{
@@ -160,7 +170,7 @@ func (s *taskService) UpdateTaskByID(ctx context.Context, stringID string, param
 	err = s.task.UpdateTaskByID(ctx, id, task)
 	if err != nil {
 		if errors.Is(err, constant.ErrTaskIDNotExists) {
-			return err
+			return errors.New(fmt.Sprintf("%s %d", err.Error(), id))
 		}
 		s.logger.Error("error updating repo task by id", zap.Error(err))
 		return constant.ErrInternalError
@@ -179,6 +189,10 @@ func (s *taskService) GetTaskByID(ctx context.Context, stringID string) (GetTask
 	if err != nil {
 		s.logger.Error("error converting string task id to int task id", zap.Error(err))
 		return response, constant.ErrInvalidTaskID
+	}
+
+	if id <= 0 {
+		return response, constant.ErrNonPositiveTaskID
 	}
 
 	task, err := s.task.GetTaskByID(ctx, id)
@@ -206,7 +220,9 @@ func (s *taskService) GetTaskByID(ctx context.Context, stringID string) (GetTask
 	response.StatusName = status.Name
 	response.Deleted = task.Deleted
 	response.CreatedAt = task.CreatedAt.Format(time.RFC3339)
-	response.DeletedAt = task.DeletedAt.Format(time.RFC3339)
+	if !task.DeletedAt.IsZero() {
+		response.DeletedAt = task.DeletedAt.Format(time.RFC3339)
+	}
 
 	return response, nil
 }

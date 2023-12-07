@@ -26,5 +26,5 @@ type GetTaskWithStatusNameModel struct {
 	Date        string `json:"date"`
 	Deleted     bool   `json:"deleted"`
 	CreatedAt   string `json:"created_at"`
-	DeletedAt   string `json:"deleted_at"`
+	DeletedAt   string `json:"deleted_at,omitempty"`
 }

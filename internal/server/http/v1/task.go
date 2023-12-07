@@ -30,7 +30,7 @@ func newTaskRoutes(g *gin.RouterGroup, task service.Task, logger logger.Logger) 
 
 // CreateTask
 //
-//	@Summary		CreateTask
+//	@Summary		Create task
 //	@Description	Create new task.
 //	@UUID			200
 //	@Param			params	body		service.CreateTaskParams	true	"Required JSON body with all required task field"
@@ -66,10 +66,10 @@ func (r *taskRoutes) CreateTask(ctx *gin.Context) {
 
 // DeleteTaskByID
 //
-//	@Summary		DeleteTaskByID
+//	@Summary		Delete task by ID
 //	@Description	Delete task by its id.
 //	@UUID			201
-//	@Param			params	path		int			true	"Required task id to delete"
+//	@Param			params	path		int			true	"Required task id for deleting"
 //	@Success		200		{object}	nil			"Task was deleted successfully"
 //	@Failure		400		{object}	response	"Invalid input data"
 //	@Failure		500		{object}	response	"Internal error"
@@ -97,10 +97,10 @@ func (r *taskRoutes) DeleteTaskByID(ctx *gin.Context) {
 
 // UpdateTaskByID
 //
-//	@Summary		UpdateTaskByID
+//	@Summary		Update task by ID
 //	@Description	Update task selected fields by its id.
 //	@UUID			202
-//	@Param			params	path		int								true	"Required task id to update"
+//	@Param			params	path		int								true	"Required task id for updating"
 //	@Param			params	body		service.UpdateTaskByIDParams	true	"Required JSON body with necessary fields to update"
 //	@Success		200		{object}	nil								"Task was updated successfully"
 //	@Failure		400		{object}	response						"Invalid input data"
@@ -137,13 +137,13 @@ func (r *taskRoutes) UpdateTaskByID(ctx *gin.Context) {
 
 // GetTaskByID
 //
-//	@Summary		GetTaskByID
+//	@Summary		Get task by ID
 //	@Description	Get task by its id.
 //	@UUID			203
-//	@Param			params	path		int							true	"Required task id to get"
-//	@Success		200		{object}	GetTaskWithStatusNameModel	"Task was gotten successfully"
-//	@Failure		400		{object}	response					"Invalid input data"
-//	@Failure		500		{object}	response					"Internal error"
+//	@Param			params	path		int									true	"Required task id for getting"
+//	@Success		200		{object}	service.GetTaskWithStatusNameModel	"Task was gotten successfully"
+//	@Failure		400		{object}	response							"Invalid input data"
+//	@Failure		500		{object}	response							"Internal error"
 //	@Router			/tasks/:id [get]
 //	@Tags			Task
 func (r *taskRoutes) GetTaskByID(ctx *gin.Context) {

@@ -3,6 +3,8 @@ CREATE TABLE IF NOT EXISTS statuses (
     name VARCHAR(16) UNIQUE NOT NULL
 );
 
+CREATE INDEX russian ON statuses USING gin (to_tsvector('russian', name));
+
 CREATE TABLE IF NOT EXISTS tasks (
     id BIGSERIAL PRIMARY KEY,
     title VARCHAR(64) NOT NULL,

@@ -8,9 +8,9 @@ import (
 
 type Task interface {
 	CreateTask(ctx context.Context, params CreateTaskParams) (CreateTaskResponse, error)
-	DeleteTaskByID(ctx context.Context, stringID string) error
-	UpdateTaskByID(ctx context.Context, stringID string, params UpdateTaskByIDParams) error
 	GetTaskByID(ctx context.Context, stringID string) (GetTaskWithStatusNameModel, error)
+	UpdateTaskByID(ctx context.Context, stringID string, params UpdateTaskByIDParams) error
+	DeleteTaskByID(ctx context.Context, stringID string) error
 }
 
 type Status interface {
