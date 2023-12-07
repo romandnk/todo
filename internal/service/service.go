@@ -7,6 +7,8 @@ import (
 )
 
 type Task interface {
+	CreateTask(ctx context.Context, params CreateTaskParams) (CreateTaskResponse, error)
+	DeleteTaskByID(ctx context.Context, stringID string) error
 }
 
 type Status interface {
@@ -15,6 +17,7 @@ type Status interface {
 
 type Services struct {
 	Status Status
+	Task   Task
 }
 
 type Dependencies struct {
@@ -25,5 +28,6 @@ type Dependencies struct {
 func NewServices(dep Dependencies) *Services {
 	return &Services{
 		Status: newStatusService(dep.Repo.Status, dep.Logger),
+		Task:   newTaskService(dep.Repo.Task, dep.Repo.Status, dep.Logger),
 	}
 }

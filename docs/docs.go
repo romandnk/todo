@@ -26,12 +26,12 @@ const docTemplate = `{
             "post": {
                 "description": "Create new task status.",
                 "tags": [
-                    "Statuses"
+                    "Status"
                 ],
                 "summary": "CreateStatus",
                 "parameters": [
                     {
-                        "description": "required JSON body with status name",
+                        "description": "Required JSON body with status name",
                         "name": "params",
                         "in": "body",
                         "required": true,
@@ -46,6 +46,81 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/service.CreateStatusResponse"
                         }
+                    },
+                    "400": {
+                        "description": "Invalid input data",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/tasks/": {
+            "post": {
+                "description": "Create new task.",
+                "tags": [
+                    "Task"
+                ],
+                "summary": "CreateTask",
+                "parameters": [
+                    {
+                        "description": "Required JSON body with all required task field",
+                        "name": "params",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/service.CreateTaskParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Task was created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/service.CreateTaskResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input data",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/tasks/:id": {
+            "delete": {
+                "description": "Delete task by its id.",
+                "tags": [
+                    "Task"
+                ],
+                "summary": "DeleteTaskByID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Required task id to delete",
+                        "name": "params",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Task was deleted successfully"
                     },
                     "400": {
                         "description": "Invalid input data",
@@ -76,6 +151,37 @@ const docTemplate = `{
             }
         },
         "service.CreateStatusResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "service.CreateTaskParams": {
+            "type": "object",
+            "required": [
+                "date",
+                "description",
+                "status_name",
+                "title"
+            ],
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "status_name": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.CreateTaskResponse": {
             "type": "object",
             "properties": {
                 "id": {

@@ -26,7 +26,7 @@ func (r *TaskRepo) CreateTask(ctx context.Context, task entity.Task) (int, error
 	query := fmt.Sprintf(`
 		INSERT INTO %[1]s
 		(title, description, status_id, date, deleted, created_at, deleted_at)
-		VALUES (%[2]s)
+		VALUES %[2]s
 		RETURNING id
 	`, constant.TasksTable, utils.SetPlaceholders(constant.PlaceholderDollar, len(values)))
 
@@ -120,12 +120,16 @@ func (r *TaskRepo) DeleteTaskByID(ctx context.Context, id int) error {
 		SET 
 		    deleted=true,
 		    deleted_at=$1
-		WHERE id=$2
+		WHERE id=$2 AND deleted=false
 	`, constant.TasksTable)
 
-	_, err := r.db.Exec(ctx, query, now, id)
+	res, err := r.db.Exec(ctx, query, now, id)
 	if err != nil {
 		return err
+	}
+
+	if res.RowsAffected() == 0 {
+		return constant.ErrTaskIDNotExists
 	}
 
 	return nil

@@ -41,6 +41,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		}
 
 		// task management group
+		tasks := api.Group("tasks")
+		{
+			newTaskRoutes(tasks, h.services.Task, h.logger)
+		}
 	}
 
 	return router

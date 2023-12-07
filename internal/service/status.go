@@ -8,6 +8,7 @@ import (
 	"github.com/romandnk/todo/internal/entity"
 	storage "github.com/romandnk/todo/internal/repo"
 	"github.com/romandnk/todo/pkg/logger"
+	"go.uber.org/zap"
 	"strings"
 	"unicode/utf8"
 )
@@ -42,6 +43,7 @@ func (s *statusService) CreateStatus(ctx context.Context, params CreateStatusPar
 	}
 	id, err := s.status.CreateStatus(ctx, status)
 	if err != nil {
+		s.logger.Error("error creating repo task", zap.Error(err))
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
 			if pgErr.Code == "23505" {

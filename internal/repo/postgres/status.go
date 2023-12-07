@@ -25,7 +25,7 @@ func (r *StatusRepo) CreateStatus(ctx context.Context, status entity.Status) (in
 	query := fmt.Sprintf(`
 		INSERT INTO %[1]s
 		(name)
-		VALUES (%[2]s)
+		VALUES %[2]s
 		RETURNING id
 	`, constant.StatusesTable, utils.SetPlaceholders(constant.PlaceholderDollar, len(values)))
 

@@ -12,6 +12,27 @@ definitions:
       id:
         type: integer
     type: object
+  service.CreateTaskParams:
+    properties:
+      date:
+        type: string
+      description:
+        type: string
+      status_name:
+        type: string
+      title:
+        type: string
+    required:
+    - date
+    - description
+    - status_name
+    - title
+    type: object
+  service.CreateTaskResponse:
+    properties:
+      id:
+        type: integer
+    type: object
   v1.response:
     properties:
       error:
@@ -34,7 +55,7 @@ paths:
     post:
       description: Create new task status.
       parameters:
-      - description: required JSON body with status name
+      - description: Required JSON body with status name
         in: body
         name: params
         required: true
@@ -55,5 +76,54 @@ paths:
             $ref: '#/definitions/v1.response'
       summary: CreateStatus
       tags:
-      - Statuses
+      - Status
+  /tasks/:
+    post:
+      description: Create new task.
+      parameters:
+      - description: Required JSON body with all required task field
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/service.CreateTaskParams'
+      responses:
+        "201":
+          description: Task was created successfully
+          schema:
+            $ref: '#/definitions/service.CreateTaskResponse'
+        "400":
+          description: Invalid input data
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: CreateTask
+      tags:
+      - Task
+  /tasks/:id:
+    delete:
+      description: Delete task by its id.
+      parameters:
+      - description: Required task id to delete
+        in: path
+        name: params
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: Task was deleted successfully
+        "400":
+          description: Invalid input data
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: DeleteTaskByID
+      tags:
+      - Task
 swagger: "2.0"
