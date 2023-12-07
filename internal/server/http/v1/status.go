@@ -29,11 +29,12 @@ func newStatusRoutes(g *gin.RouterGroup, status service.Status, logger logger.Lo
 //	@Summary		CreateStatus
 //	@Description	Create new task status.
 //	@UUID			100
-//	@Success		200	{object}	service.CreateStatusResponse	"Status was created successfully"
-//	@Failure		400	{object}	response						"Invalid input data"
-//	@Failure		500	{object}	response						"Internal error"
+//	@Param			params	body		service.CreateStatusParams		true	"required JSON body with status name"
+//	@Success		200		{object}	service.CreateStatusResponse	"Status was created successfully"
+//	@Failure		400		{object}	response						"Invalid input data"
+//	@Failure		500		{object}	response						"Internal error"
 //	@Router			/statuses/ [post]
-//	@Tags			status_handler
+//	@Tags			Statuses
 func (r *statusRoutes) CreateStatus(ctx *gin.Context) {
 	var params service.CreateStatusParams
 

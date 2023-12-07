@@ -26,9 +26,20 @@ const docTemplate = `{
             "post": {
                 "description": "Create new task status.",
                 "tags": [
-                    "status_handler"
+                    "Statuses"
                 ],
                 "summary": "CreateStatus",
+                "parameters": [
+                    {
+                        "description": "required JSON body with status name",
+                        "name": "params",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/service.CreateStatusParams"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Status was created successfully",
@@ -53,6 +64,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "service.CreateStatusParams": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "service.CreateStatusResponse": {
             "type": "object",
             "properties": {

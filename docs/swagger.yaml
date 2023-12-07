@@ -1,5 +1,12 @@
 basePath: /api/v1/
 definitions:
+  service.CreateStatusParams:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
   service.CreateStatusResponse:
     properties:
       id:
@@ -26,6 +33,13 @@ paths:
   /statuses/:
     post:
       description: Create new task status.
+      parameters:
+      - description: required JSON body with status name
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/service.CreateStatusParams'
       responses:
         "200":
           description: Status was created successfully
@@ -41,5 +55,5 @@ paths:
             $ref: '#/definitions/v1.response'
       summary: CreateStatus
       tags:
-      - status_handler
+      - Statuses
 swagger: "2.0"
