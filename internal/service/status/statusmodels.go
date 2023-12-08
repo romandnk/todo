@@ -1,4 +1,4 @@
-package service
+package statusservice
 
 type CreateStatusParams struct {
 	Name string `json:"name" binding:"required"`

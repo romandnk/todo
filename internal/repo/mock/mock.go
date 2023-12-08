@@ -68,6 +68,21 @@ func (mr *MockTaskMockRecorder) DeleteTaskByID(ctx, id any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteTaskByID", reflect.TypeOf((*MockTask)(nil).DeleteTaskByID), ctx, id)
 }
 
+// GetAllTasks mocks base method.
+func (m *MockTask) GetAllTasks(ctx context.Context) ([]*entity.Task, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllTasks", ctx)
+	ret0, _ := ret[0].([]*entity.Task)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAllTasks indicates an expected call of GetAllTasks.
+func (mr *MockTaskMockRecorder) GetAllTasks(ctx any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllTasks", reflect.TypeOf((*MockTask)(nil).GetAllTasks), ctx)
+}
+
 // GetTaskByID mocks base method.
 func (m *MockTask) GetTaskByID(ctx context.Context, id int) (entity.Task, error) {
 	m.ctrl.T.Helper()
@@ -133,6 +148,21 @@ func (m *MockStatus) CreateStatus(ctx context.Context, status entity.Status) (in
 func (mr *MockStatusMockRecorder) CreateStatus(ctx, status any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateStatus", reflect.TypeOf((*MockStatus)(nil).CreateStatus), ctx, status)
+}
+
+// GetAllStatuses mocks base method.
+func (m *MockStatus) GetAllStatuses(ctx context.Context) ([]*entity.Status, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllStatuses", ctx)
+	ret0, _ := ret[0].([]*entity.Status)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAllStatuses indicates an expected call of GetAllStatuses.
+func (mr *MockStatusMockRecorder) GetAllStatuses(ctx any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllStatuses", reflect.TypeOf((*MockStatus)(nil).GetAllStatuses), ctx)
 }
 
 // GetStatusByID mocks base method.

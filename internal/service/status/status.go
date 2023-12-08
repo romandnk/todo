@@ -1,4 +1,4 @@
-package service
+package statusservice
 
 import (
 	"context"
@@ -13,19 +13,19 @@ import (
 	"unicode/utf8"
 )
 
-type statusService struct {
+type StatusService struct {
 	status storage.Status
 	logger logger.Logger
 }
 
-func newStatusService(status storage.Status, logger logger.Logger) *statusService {
-	return &statusService{
+func NewStatusService(status storage.Status, logger logger.Logger) *StatusService {
+	return &StatusService{
 		status: status,
 		logger: logger,
 	}
 }
 
-func (s *statusService) CreateStatus(ctx context.Context, params CreateStatusParams) (CreateStatusResponse, error) {
+func (s *StatusService) CreateStatus(ctx context.Context, params CreateStatusParams) (CreateStatusResponse, error) {
 	var response CreateStatusResponse
 
 	params.Name = strings.TrimSpace(params.Name)

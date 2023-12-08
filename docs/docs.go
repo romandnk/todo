@@ -36,7 +36,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.CreateStatusParams"
+                            "$ref": "#/definitions/statusservice.CreateStatusParams"
                         }
                     }
                 ],
@@ -44,7 +44,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Status was created successfully",
                         "schema": {
-                            "$ref": "#/definitions/service.CreateStatusResponse"
+                            "$ref": "#/definitions/statusservice.CreateStatusResponse"
                         }
                     },
                     "400": {
@@ -63,12 +63,33 @@ const docTemplate = `{
             }
         },
         "/tasks/": {
+            "get": {
+                "description": "Get all deleted and not deleted tasks.",
+                "tags": [
+                    "Task"
+                ],
+                "summary": "Get all tasks",
+                "responses": {
+                    "200": {
+                        "description": "Tasks were gotten successfully",
+                        "schema": {
+                            "$ref": "#/definitions/taskservice.GetAllTasksResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create new task.",
                 "tags": [
                     "Task"
                 ],
-                "summary": "CreateTask",
+                "summary": "Create task",
                 "parameters": [
                     {
                         "description": "Required JSON body with all required task field",
@@ -76,7 +97,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.CreateTaskParams"
+                            "$ref": "#/definitions/taskservice.CreateTaskParams"
                         }
                     }
                 ],
@@ -84,7 +105,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Task was created successfully",
                         "schema": {
-                            "$ref": "#/definitions/service.CreateTaskResponse"
+                            "$ref": "#/definitions/taskservice.CreateTaskResponse"
                         }
                     },
                     "400": {
@@ -108,7 +129,7 @@ const docTemplate = `{
                 "tags": [
                     "Task"
                 ],
-                "summary": "GetTaskByID",
+                "summary": "Get task by ID",
                 "parameters": [
                     {
                         "type": "integer",
@@ -122,7 +143,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Task was gotten successfully",
                         "schema": {
-                            "$ref": "#/definitions/service.GetTaskWithStatusNameModel"
+                            "$ref": "#/definitions/taskservice.GetTaskWithStatusNameModel"
                         }
                     },
                     "400": {
@@ -144,7 +165,7 @@ const docTemplate = `{
                 "tags": [
                     "Task"
                 ],
-                "summary": "DeleteTaskByID",
+                "summary": "Delete task by ID",
                 "parameters": [
                     {
                         "type": "integer",
@@ -177,7 +198,7 @@ const docTemplate = `{
                 "tags": [
                     "Task"
                 ],
-                "summary": "UpdateTaskByID",
+                "summary": "Update task by ID",
                 "parameters": [
                     {
                         "type": "integer",
@@ -192,7 +213,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.UpdateTaskByIDParams"
+                            "$ref": "#/definitions/taskservice.UpdateTaskByIDParams"
                         }
                     }
                 ],
@@ -217,7 +238,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "service.CreateStatusParams": {
+        "statusservice.CreateStatusParams": {
             "type": "object",
             "required": [
                 "name"
@@ -228,7 +249,7 @@ const docTemplate = `{
                 }
             }
         },
-        "service.CreateStatusResponse": {
+        "statusservice.CreateStatusResponse": {
             "type": "object",
             "properties": {
                 "id": {
@@ -236,7 +257,7 @@ const docTemplate = `{
                 }
             }
         },
-        "service.CreateTaskParams": {
+        "taskservice.CreateTaskParams": {
             "type": "object",
             "required": [
                 "date",
@@ -259,7 +280,7 @@ const docTemplate = `{
                 }
             }
         },
-        "service.CreateTaskResponse": {
+        "taskservice.CreateTaskResponse": {
             "type": "object",
             "properties": {
                 "id": {
@@ -267,7 +288,18 @@ const docTemplate = `{
                 }
             }
         },
-        "service.GetTaskWithStatusNameModel": {
+        "taskservice.GetAllTasksResponse": {
+            "type": "object",
+            "properties": {
+                "tasks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/taskservice.GetTaskWithStatusNameModel"
+                    }
+                }
+            }
+        },
+        "taskservice.GetTaskWithStatusNameModel": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -296,7 +328,7 @@ const docTemplate = `{
                 }
             }
         },
-        "service.UpdateTaskByIDParams": {
+        "taskservice.UpdateTaskByIDParams": {
             "type": "object",
             "properties": {
                 "date": {

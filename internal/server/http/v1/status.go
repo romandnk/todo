@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/romandnk/todo/internal/constant"
 	"github.com/romandnk/todo/internal/service"
+	statusservice "github.com/romandnk/todo/internal/service/status"
 	"github.com/romandnk/todo/pkg/logger"
 	"go.uber.org/zap"
 	"net/http"
@@ -29,14 +30,14 @@ func newStatusRoutes(g *gin.RouterGroup, status service.Status, logger logger.Lo
 //	@Summary		CreateStatus
 //	@Description	Create new task status.
 //	@UUID			100
-//	@Param			params	body		service.CreateStatusParams		true	"Required JSON body with status name"
-//	@Success		200		{object}	service.CreateStatusResponse	"Status was created successfully"
-//	@Failure		400		{object}	response						"Invalid input data"
-//	@Failure		500		{object}	response						"Internal error"
+//	@Param			params	body		statusservice.CreateStatusParams	true	"Required JSON body with status name"
+//	@Success		200		{object}	statusservice.CreateStatusResponse	"Status was created successfully"
+//	@Failure		400		{object}	response							"Invalid input data"
+//	@Failure		500		{object}	response							"Internal error"
 //	@Router			/statuses/ [post]
 //	@Tags			Status
 func (r *statusRoutes) CreateStatus(ctx *gin.Context) {
-	var params service.CreateStatusParams
+	var params statusservice.CreateStatusParams
 
 	if err := ctx.ShouldBindJSON(&params); err != nil {
 		r.logger.Error("error binding json body", zap.Error(err))

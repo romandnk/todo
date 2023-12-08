@@ -1,4 +1,4 @@
-package service
+package taskservice
 
 import (
 	"context"
@@ -16,21 +16,21 @@ import (
 	"unicode/utf8"
 )
 
-type taskService struct {
+type TaskService struct {
 	task   storage.Task
 	status storage.Status
 	logger logger.Logger
 }
 
-func newTaskService(task storage.Task, status storage.Status, logger logger.Logger) *taskService {
-	return &taskService{
+func NewTaskService(task storage.Task, status storage.Status, logger logger.Logger) *TaskService {
+	return &TaskService{
 		task:   task,
 		status: status,
 		logger: logger,
 	}
 }
 
-func (s *taskService) CreateTask(ctx context.Context, params CreateTaskParams) (CreateTaskResponse, error) {
+func (s *TaskService) CreateTask(ctx context.Context, params CreateTaskParams) (CreateTaskResponse, error) {
 	var response CreateTaskResponse
 
 	params.Title = strings.TrimSpace(params.Title)
@@ -92,7 +92,7 @@ func (s *taskService) CreateTask(ctx context.Context, params CreateTaskParams) (
 	return response, nil
 }
 
-func (s *taskService) DeleteTaskByID(ctx context.Context, stringID string) error {
+func (s *TaskService) DeleteTaskByID(ctx context.Context, stringID string) error {
 	if stringID == "" {
 		return constant.ErrEmptyTaskID
 	}
@@ -118,7 +118,7 @@ func (s *taskService) DeleteTaskByID(ctx context.Context, stringID string) error
 	return nil
 }
 
-func (s *taskService) UpdateTaskByID(ctx context.Context, stringID string, params UpdateTaskByIDParams) error {
+func (s *TaskService) UpdateTaskByID(ctx context.Context, stringID string, params UpdateTaskByIDParams) error {
 	if stringID == "" {
 		return constant.ErrEmptyTaskID
 	}
@@ -179,7 +179,7 @@ func (s *taskService) UpdateTaskByID(ctx context.Context, stringID string, param
 	return nil
 }
 
-func (s *taskService) GetAllTasks(ctx context.Context) (GetAllTasksResponse, error) {
+func (s *TaskService) GetAllTasks(ctx context.Context) (GetAllTasksResponse, error) {
 	var response GetAllTasksResponse
 
 	statuses, err := s.status.GetAllStatuses(ctx)
@@ -231,7 +231,7 @@ func (s *taskService) GetAllTasks(ctx context.Context) (GetAllTasksResponse, err
 	return response, nil
 }
 
-func (s *taskService) GetTaskByID(ctx context.Context, stringID string) (GetTaskWithStatusNameModel, error) {
+func (s *TaskService) GetTaskByID(ctx context.Context, stringID string) (GetTaskWithStatusNameModel, error) {
 	var response GetTaskWithStatusNameModel
 
 	if stringID == "" {

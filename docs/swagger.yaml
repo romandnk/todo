@@ -1,18 +1,18 @@
 basePath: /api/v1/
 definitions:
-  service.CreateStatusParams:
+  statusservice.CreateStatusParams:
     properties:
       name:
         type: string
     required:
     - name
     type: object
-  service.CreateStatusResponse:
+  statusservice.CreateStatusResponse:
     properties:
       id:
         type: integer
     type: object
-  service.CreateTaskParams:
+  taskservice.CreateTaskParams:
     properties:
       date:
         type: string
@@ -28,12 +28,19 @@ definitions:
     - status_name
     - title
     type: object
-  service.CreateTaskResponse:
+  taskservice.CreateTaskResponse:
     properties:
       id:
         type: integer
     type: object
-  service.GetTaskWithStatusNameModel:
+  taskservice.GetAllTasksResponse:
+    properties:
+      tasks:
+        items:
+          $ref: '#/definitions/taskservice.GetTaskWithStatusNameModel'
+        type: array
+    type: object
+  taskservice.GetTaskWithStatusNameModel:
     properties:
       created_at:
         type: string
@@ -52,7 +59,7 @@ definitions:
       title:
         type: string
     type: object
-  service.UpdateTaskByIDParams:
+  taskservice.UpdateTaskByIDParams:
     properties:
       date:
         type: string
@@ -90,12 +97,12 @@ paths:
         name: params
         required: true
         schema:
-          $ref: '#/definitions/service.CreateStatusParams'
+          $ref: '#/definitions/statusservice.CreateStatusParams'
       responses:
         "200":
           description: Status was created successfully
           schema:
-            $ref: '#/definitions/service.CreateStatusResponse'
+            $ref: '#/definitions/statusservice.CreateStatusResponse'
         "400":
           description: Invalid input data
           schema:
@@ -108,6 +115,20 @@ paths:
       tags:
       - Status
   /tasks/:
+    get:
+      description: Get all deleted and not deleted tasks.
+      responses:
+        "200":
+          description: Tasks were gotten successfully
+          schema:
+            $ref: '#/definitions/taskservice.GetAllTasksResponse'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Get all tasks
+      tags:
+      - Task
     post:
       description: Create new task.
       parameters:
@@ -116,12 +137,12 @@ paths:
         name: params
         required: true
         schema:
-          $ref: '#/definitions/service.CreateTaskParams'
+          $ref: '#/definitions/taskservice.CreateTaskParams'
       responses:
         "201":
           description: Task was created successfully
           schema:
-            $ref: '#/definitions/service.CreateTaskResponse'
+            $ref: '#/definitions/taskservice.CreateTaskResponse'
         "400":
           description: Invalid input data
           schema:
@@ -130,7 +151,7 @@ paths:
           description: Internal error
           schema:
             $ref: '#/definitions/v1.response'
-      summary: CreateTask
+      summary: Create task
       tags:
       - Task
   /tasks/:id:
@@ -153,7 +174,7 @@ paths:
           description: Internal error
           schema:
             $ref: '#/definitions/v1.response'
-      summary: DeleteTaskByID
+      summary: Delete task by ID
       tags:
       - Task
     get:
@@ -168,7 +189,7 @@ paths:
         "200":
           description: Task was gotten successfully
           schema:
-            $ref: '#/definitions/service.GetTaskWithStatusNameModel'
+            $ref: '#/definitions/taskservice.GetTaskWithStatusNameModel'
         "400":
           description: Invalid input data
           schema:
@@ -177,7 +198,7 @@ paths:
           description: Internal error
           schema:
             $ref: '#/definitions/v1.response'
-      summary: GetTaskByID
+      summary: Get task by ID
       tags:
       - Task
     patch:
@@ -193,7 +214,7 @@ paths:
         name: params
         required: true
         schema:
-          $ref: '#/definitions/service.UpdateTaskByIDParams'
+          $ref: '#/definitions/taskservice.UpdateTaskByIDParams'
       responses:
         "200":
           description: Task was updated successfully
@@ -205,7 +226,7 @@ paths:
           description: Internal error
           schema:
             $ref: '#/definitions/v1.response'
-      summary: UpdateTaskByID
+      summary: Update task by ID
       tags:
       - Task
 swagger: "2.0"

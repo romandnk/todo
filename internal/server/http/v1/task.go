@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/romandnk/todo/internal/constant"
 	"github.com/romandnk/todo/internal/service"
+	"github.com/romandnk/todo/internal/service/task"
 	"github.com/romandnk/todo/pkg/logger"
 	"go.uber.org/zap"
 	"net/http"
@@ -26,6 +27,7 @@ func newTaskRoutes(g *gin.RouterGroup, task service.Task, logger logger.Logger) 
 	g.DELETE("/:id", r.DeleteTaskByID)
 	g.PATCH("/:id", r.UpdateTaskByID)
 	g.GET("/:id", r.GetTaskByID)
+	g.GET("/", r.GetAllTasks)
 }
 
 // CreateTask
@@ -33,14 +35,14 @@ func newTaskRoutes(g *gin.RouterGroup, task service.Task, logger logger.Logger) 
 //	@Summary		Create task
 //	@Description	Create new task.
 //	@UUID			200
-//	@Param			params	body		service.CreateTaskParams	true	"Required JSON body with all required task field"
-//	@Success		201		{object}	service.CreateTaskResponse	"Task was created successfully"
-//	@Failure		400		{object}	response					"Invalid input data"
-//	@Failure		500		{object}	response					"Internal error"
+//	@Param			params	body		taskservice.CreateTaskParams	true	"Required JSON body with all required task field"
+//	@Success		201		{object}	taskservice.CreateTaskResponse	"Task was created successfully"
+//	@Failure		400		{object}	response						"Invalid input data"
+//	@Failure		500		{object}	response						"Internal error"
 //	@Router			/tasks/ [post]
 //	@Tags			Task
 func (r *taskRoutes) CreateTask(ctx *gin.Context) {
-	var params service.CreateTaskParams
+	var params taskservice.CreateTaskParams
 
 	if err := ctx.ShouldBindJSON(&params); err != nil {
 		r.logger.Error("error binding json body", zap.Error(err))
@@ -100,15 +102,15 @@ func (r *taskRoutes) DeleteTaskByID(ctx *gin.Context) {
 //	@Summary		Update task by ID
 //	@Description	Update task selected fields by its id.
 //	@UUID			202
-//	@Param			params	path		int								true	"Required task id for updating"
-//	@Param			params	body		service.UpdateTaskByIDParams	true	"Required JSON body with necessary fields to update"
-//	@Success		200		{object}	nil								"Task was updated successfully"
-//	@Failure		400		{object}	response						"Invalid input data"
-//	@Failure		500		{object}	response						"Internal error"
+//	@Param			params	path		int									true	"Required task id for updating"
+//	@Param			params	body		taskservice.UpdateTaskByIDParams	true	"Required JSON body with necessary fields to update"
+//	@Success		200		{object}	nil									"Task was updated successfully"
+//	@Failure		400		{object}	response							"Invalid input data"
+//	@Failure		500		{object}	response							"Internal error"
 //	@Router			/tasks/:id [patch]
 //	@Tags			Task
 func (r *taskRoutes) UpdateTaskByID(ctx *gin.Context) {
-	var params service.UpdateTaskByIDParams
+	var params taskservice.UpdateTaskByIDParams
 
 	if err := ctx.ShouldBindJSON(&params); err != nil {
 		r.logger.Error("error binding json body", zap.Error(err))
@@ -140,10 +142,10 @@ func (r *taskRoutes) UpdateTaskByID(ctx *gin.Context) {
 //	@Summary		Get task by ID
 //	@Description	Get task by its id.
 //	@UUID			203
-//	@Param			params	path		int									true	"Required task id for getting"
-//	@Success		200		{object}	service.GetTaskWithStatusNameModel	"Task was gotten successfully"
-//	@Failure		400		{object}	response							"Invalid input data"
-//	@Failure		500		{object}	response							"Internal error"
+//	@Param			params	path		int										true	"Required task id for getting"
+//	@Success		200		{object}	taskservice.GetTaskWithStatusNameModel	"Task was gotten successfully"
+//	@Failure		400		{object}	response								"Invalid input data"
+//	@Failure		500		{object}	response								"Internal error"
 //	@Router			/tasks/:id [get]
 //	@Tags			Task
 func (r *taskRoutes) GetTaskByID(ctx *gin.Context) {
@@ -159,6 +161,26 @@ func (r *taskRoutes) GetTaskByID(ctx *gin.Context) {
 			zap.Error(err),
 			zap.String("task id", id))
 		sentErrorResponse(ctx, code, "error getting task by id", err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, resp)
+}
+
+// GetAllTasks
+//
+//	@Summary		Get all tasks
+//	@Description	Get all deleted and not deleted tasks.
+//	@UUID			204
+//	@Success		200	{object}	taskservice.GetAllTasksResponse	"Tasks were gotten successfully"
+//	@Failure		500	{object}	response						"Internal error"
+//	@Router			/tasks/ [get]
+//	@Tags			Task
+func (r *taskRoutes) GetAllTasks(ctx *gin.Context) {
+	resp, err := r.task.GetAllTasks(ctx)
+	if err != nil {
+		r.logger.Error("error getting all tasks", zap.Error(err))
+		sentErrorResponse(ctx, http.StatusInternalServerError, "error getting all task", err)
 		return
 	}
 

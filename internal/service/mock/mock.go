@@ -12,7 +12,8 @@ import (
 	context "context"
 	reflect "reflect"
 
-	service "github.com/romandnk/todo/internal/service"
+	statusservice "github.com/romandnk/todo/internal/service/status"
+	taskservice "github.com/romandnk/todo/internal/service/task"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -40,10 +41,10 @@ func (m *MockTask) EXPECT() *MockTaskMockRecorder {
 }
 
 // CreateTask mocks base method.
-func (m *MockTask) CreateTask(ctx context.Context, params service.CreateTaskParams) (service.CreateTaskResponse, error) {
+func (m *MockTask) CreateTask(ctx context.Context, params taskservice.CreateTaskParams) (taskservice.CreateTaskResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateTask", ctx, params)
-	ret0, _ := ret[0].(service.CreateTaskResponse)
+	ret0, _ := ret[0].(taskservice.CreateTaskResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -68,11 +69,26 @@ func (mr *MockTaskMockRecorder) DeleteTaskByID(ctx, stringID any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteTaskByID", reflect.TypeOf((*MockTask)(nil).DeleteTaskByID), ctx, stringID)
 }
 
+// GetAllTasks mocks base method.
+func (m *MockTask) GetAllTasks(ctx context.Context) (taskservice.GetAllTasksResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllTasks", ctx)
+	ret0, _ := ret[0].(taskservice.GetAllTasksResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAllTasks indicates an expected call of GetAllTasks.
+func (mr *MockTaskMockRecorder) GetAllTasks(ctx any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllTasks", reflect.TypeOf((*MockTask)(nil).GetAllTasks), ctx)
+}
+
 // GetTaskByID mocks base method.
-func (m *MockTask) GetTaskByID(ctx context.Context, stringID string) (service.GetTaskWithStatusNameModel, error) {
+func (m *MockTask) GetTaskByID(ctx context.Context, stringID string) (taskservice.GetTaskWithStatusNameModel, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetTaskByID", ctx, stringID)
-	ret0, _ := ret[0].(service.GetTaskWithStatusNameModel)
+	ret0, _ := ret[0].(taskservice.GetTaskWithStatusNameModel)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -84,7 +100,7 @@ func (mr *MockTaskMockRecorder) GetTaskByID(ctx, stringID any) *gomock.Call {
 }
 
 // UpdateTaskByID mocks base method.
-func (m *MockTask) UpdateTaskByID(ctx context.Context, stringID string, params service.UpdateTaskByIDParams) error {
+func (m *MockTask) UpdateTaskByID(ctx context.Context, stringID string, params taskservice.UpdateTaskByIDParams) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateTaskByID", ctx, stringID, params)
 	ret0, _ := ret[0].(error)
@@ -121,10 +137,10 @@ func (m *MockStatus) EXPECT() *MockStatusMockRecorder {
 }
 
 // CreateStatus mocks base method.
-func (m *MockStatus) CreateStatus(ctx context.Context, params service.CreateStatusParams) (service.CreateStatusResponse, error) {
+func (m *MockStatus) CreateStatus(ctx context.Context, params statusservice.CreateStatusParams) (statusservice.CreateStatusResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateStatus", ctx, params)
-	ret0, _ := ret[0].(service.CreateStatusResponse)
+	ret0, _ := ret[0].(statusservice.CreateStatusResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

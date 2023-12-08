@@ -1,4 +1,4 @@
-package service
+package taskservice
 
 type CreateTaskParams struct {
 	Title       string `json:"title" binding:"required"`
