@@ -1,5 +1,7 @@
 package storage
 
+//go:generate mockgen -source=storage.go -destination=mock/mock.go storage
+
 import (
 	"context"
 	"github.com/romandnk/todo/internal/entity"
