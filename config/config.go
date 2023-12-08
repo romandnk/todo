@@ -28,15 +28,15 @@ type Postgres struct {
 	User     string `env:"POSTGRES_USER" env-required:"true"`
 	Password string `env:"POSTGRES_PASSWORD" env-required:"true"`
 	DBName   string `env:"POSTGRES_DB" env-required:"true"`
-	SSLMode  string `yaml:"ssl_mode" env:"POSTGRES_SSLMODE" env-default:"disable"`
+	SSLMode  string `yaml:"ssl_mode" env:"POSTGRES_SSLMODE" env-required:"true"`
 	MaxConns int32  `yaml:"max_conns"`
 	MinConns int32  `yaml:"min_conns"`
 }
 
 type HTTPServer struct {
-	Host            string        `env:"HTTP_SERVER_HOST" env-default:"localhost"`
-	Port            int           `env:"HTTP_SERVER_PORT" env-default:"8080"`
-	ReadTimeout     time.Duration `yaml:"read_timeout" env-default:"5s"`
+	Host            string        `env:"HTTP_SERVER_HOST" env-required:"true"`
+	Port            int           `env:"HTTP_SERVER_PORT" env-required:"true"`
+	ReadTimeout     time.Duration `yaml:"read_timeout" env-default:"3s"`
 	WriteTimeout    time.Duration `yaml:"write_timeout" env-default:"5s"`
 	ShutdownTimeout time.Duration `yaml:"shutdown_timeout" env-default:"5s"`
 }
