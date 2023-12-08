@@ -22,7 +22,7 @@ func NewTaskRepo(db postgres.PgxPool) *TaskRepo {
 func (r *TaskRepo) CreateTask(ctx context.Context, task entity.Task) (int, error) {
 	var id int
 
-	values := []any{task.Title, task.Description, task.StatusID, task.Date, task.Deleted, task.CreatedAt, task.DeletedAt}
+	values := []any{task.Title, task.Description, task.StatusID, task.Date, task.Deleted, time.Now().UTC(), task.DeletedAt}
 	placeholderString, err := utils.SetPlaceholders(constant.PlaceholderDollar, len(values))
 	if err != nil {
 		return id, err

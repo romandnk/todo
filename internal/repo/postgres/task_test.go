@@ -29,7 +29,6 @@ func TestTaskRepoCreateTask(t *testing.T) {
 		StatusID:    1,
 		Date:        now,
 		Deleted:     false,
-		CreatedAt:   now,
 		DeletedAt:   time.Time{},
 	}
 	expectedID := 1
@@ -50,7 +49,7 @@ func TestTaskRepoCreateTask(t *testing.T) {
 		inputTask.StatusID,
 		inputTask.Date,
 		inputTask.Deleted,
-		inputTask.CreatedAt,
+		pgxmock.AnyArg(),
 		inputTask.DeletedAt,
 	).WillReturnRows(rows)
 

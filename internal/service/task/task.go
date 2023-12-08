@@ -78,7 +78,6 @@ func (s *TaskService) CreateTask(ctx context.Context, params CreateTaskParams) (
 		StatusID:    status.ID,
 		Date:        date.UTC(),
 		Deleted:     false,
-		CreatedAt:   now,
 		DeletedAt:   time.Time{},
 	}
 	id, err := s.task.CreateTask(ctx, task)

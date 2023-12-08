@@ -22,9 +22,14 @@ type Status interface {
 	CreateStatus(ctx context.Context, params statusservice.CreateStatusParams) (statusservice.CreateStatusResponse, error)
 }
 
-type Services struct {
-	Status Status
-	Task   Task
+type Services interface {
+	Task
+	Status
+}
+
+type Service struct {
+	Status
+	Task
 }
 
 type Dependencies struct {
@@ -32,8 +37,8 @@ type Dependencies struct {
 	Logger logger.Logger
 }
 
-func NewServices(dep Dependencies) *Services {
-	return &Services{
+func NewServices(dep Dependencies) *Service {
+	return &Service{
 		Status: statusservice.NewStatusService(dep.Repo.Status, dep.Logger),
 		Task:   taskservice.NewTaskService(dep.Repo.Task, dep.Repo.Status, dep.Logger),
 	}
