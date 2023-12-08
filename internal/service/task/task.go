@@ -219,11 +219,7 @@ func (s *TaskService) GetAllTasks(ctx context.Context) (GetAllTasksResponse, err
 			Description: task.Description,
 			StatusName:  mapStatuses[task.StatusID],
 			Date:        task.Date.Format(time.RFC3339),
-			Deleted:     task.Deleted,
 			CreatedAt:   task.CreatedAt.Format(time.RFC3339),
-		}
-		if !task.DeletedAt.IsZero() {
-			taskWithStatusName.DeletedAt = task.DeletedAt.Format(time.RFC3339)
 		}
 		response.Tasks = append(response.Tasks, taskWithStatusName)
 	}
@@ -272,11 +268,7 @@ func (s *TaskService) GetTaskByID(ctx context.Context, stringID string) (GetTask
 	response.Description = task.Description
 	response.Date = task.Date.Format(time.RFC3339)
 	response.StatusName = status.Name
-	response.Deleted = task.Deleted
 	response.CreatedAt = task.CreatedAt.Format(time.RFC3339)
-	if !task.DeletedAt.IsZero() {
-		response.DeletedAt = task.DeletedAt.Format(time.RFC3339)
-	}
 
 	return response, nil
 }

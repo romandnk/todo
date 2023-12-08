@@ -24,9 +24,7 @@ type GetTaskWithStatusNameModel struct {
 	Description string `json:"description"`
 	StatusName  string `json:"status_name"`
 	Date        string `json:"date"`
-	Deleted     bool   `json:"deleted"`
 	CreatedAt   string `json:"created_at"`
-	DeletedAt   string `json:"deleted_at,omitempty"`
 }
 
 type GetAllTasksResponse struct {

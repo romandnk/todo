@@ -51,11 +51,10 @@ func (r *TaskRepo) GetAllTasks(ctx context.Context) ([]*entity.Task, error) {
 		    title, 
 		    description, 
 		    status_id, 
-		    date, 
-		    deleted, 
-		    created_at, 
-		    deleted_at
-		FROM %[1]s
+		    date,  
+		    created_at
+		FROM %[1]s 
+		WHERE deleted=false
 	`, constant.TasksTable)
 
 	err := pgxscan.Select(ctx, r.db, &tasks, query)
@@ -76,11 +75,9 @@ func (r *TaskRepo) GetTaskByID(ctx context.Context, id int) (entity.Task, error)
 		    description, 
 		    status_id, 
 		    date, 
-		    deleted, 
-		    created_at, 
-		    deleted_at
+		    created_at
 		FROM %[1]s
-		WHERE id=$1
+		WHERE id=$1 AND deleted=false
 	`, constant.TasksTable)
 
 	err := pgxscan.Get(ctx, r.db, &task, query, id)
