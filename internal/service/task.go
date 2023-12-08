@@ -179,6 +179,58 @@ func (s *taskService) UpdateTaskByID(ctx context.Context, stringID string, param
 	return nil
 }
 
+func (s *taskService) GetAllTasks(ctx context.Context) (GetAllTasksResponse, error) {
+	var response GetAllTasksResponse
+
+	statuses, err := s.status.GetAllStatuses(ctx)
+	if err != nil {
+		s.logger.Error("error getting repo all statuses", zap.Error(err))
+		if errors.Is(err, pgx.ErrNoRows) {
+			return response, errors.New("statuses are not found")
+		}
+		return response, constant.ErrInternalError
+	}
+
+	mapStatuses := make(map[int]string, len(statuses))
+	for _, status := range statuses {
+		if status != nil {
+			mapStatuses[status.ID] = status.Name
+		} else {
+			s.logger.Error("error status is nil")
+			return response, constant.ErrInternalError
+		}
+	}
+
+	tasks, err := s.task.GetAllTasks(ctx)
+	if err != nil {
+		s.logger.Error("error getting repo all tasks", zap.Error(err))
+		if errors.Is(err, pgx.ErrNoRows) {
+			return response, nil
+		}
+		return response, constant.ErrInternalError
+	}
+
+	response.Tasks = make([]GetTaskWithStatusNameModel, 0, len(tasks))
+	taskWithStatusName := GetTaskWithStatusNameModel{}
+	for _, task := range tasks {
+		taskWithStatusName = GetTaskWithStatusNameModel{
+			ID:          task.ID,
+			Title:       task.Title,
+			Description: task.Description,
+			StatusName:  mapStatuses[task.StatusID],
+			Date:        task.Date.Format(time.RFC3339),
+			Deleted:     task.Deleted,
+			CreatedAt:   task.CreatedAt.Format(time.RFC3339),
+		}
+		if !task.DeletedAt.IsZero() {
+			taskWithStatusName.DeletedAt = task.DeletedAt.Format(time.RFC3339)
+		}
+		response.Tasks = append(response.Tasks, taskWithStatusName)
+	}
+
+	return response, nil
+}
+
 func (s *taskService) GetTaskByID(ctx context.Context, stringID string) (GetTaskWithStatusNameModel, error) {
 	var response GetTaskWithStatusNameModel
 

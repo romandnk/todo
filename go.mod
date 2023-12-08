@@ -12,6 +12,7 @@ require (
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.2
+	go.uber.org/mock v0.3.0
 	go.uber.org/zap v1.26.0
 )
 

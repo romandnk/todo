@@ -38,6 +38,30 @@ func (r *TaskRepo) CreateTask(ctx context.Context, task entity.Task) (int, error
 	return id, nil
 }
 
+func (r *TaskRepo) GetAllTasks(ctx context.Context) ([]*entity.Task, error) {
+	var tasks []*entity.Task
+
+	query := fmt.Sprintf(`
+		SELECT 
+		    id, 
+		    title, 
+		    description, 
+		    status_id, 
+		    date, 
+		    deleted, 
+		    created_at, 
+		    deleted_at
+		FROM %[1]s
+	`, constant.TasksTable)
+
+	err := pgxscan.Select(ctx, r.db, &tasks, query)
+	if err != nil {
+		return tasks, err
+	}
+
+	return tasks, nil
+}
+
 func (r *TaskRepo) GetTaskByID(ctx context.Context, id int) (entity.Task, error) {
 	var task entity.Task
 

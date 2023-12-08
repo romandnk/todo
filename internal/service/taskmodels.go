@@ -28,3 +28,7 @@ type GetTaskWithStatusNameModel struct {
 	CreatedAt   string `json:"created_at"`
 	DeletedAt   string `json:"deleted_at,omitempty"`
 }
+
+type GetAllTasksResponse struct {
+	Tasks []GetTaskWithStatusNameModel `json:"tasks"`
+}

@@ -37,6 +37,22 @@ func (r *StatusRepo) CreateStatus(ctx context.Context, status entity.Status) (in
 	return id, nil
 }
 
+func (r *StatusRepo) GetAllStatuses(ctx context.Context) ([]*entity.Status, error) {
+	var statuses []*entity.Status
+
+	query := fmt.Sprintf(`
+		SELECT id, name
+		FROM %[1]s
+	`, constant.StatusesTable)
+
+	err := pgxscan.Select(ctx, r.db, &statuses, query)
+	if err != nil {
+		return statuses, err
+	}
+
+	return statuses, nil
+}
+
 func (r *StatusRepo) GetStatusByName(ctx context.Context, name string) (entity.Status, error) {
 	var status entity.Status
 

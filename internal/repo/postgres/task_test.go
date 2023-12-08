@@ -63,6 +63,101 @@ func TestTaskRepo_CreateTask(t *testing.T) {
 	require.NoError(t, mock.ExpectationsWereMet(), "there was unexpected result")
 }
 
+func TestTaskRepo_GetAllTasks(t *testing.T) {
+	now := time.Now().UTC()
+
+	testCases := []struct {
+		name          string
+		expectedTasks []*entity.Task
+		expectedError error
+	}{
+		{
+			name: "OK",
+			expectedTasks: []*entity.Task{
+				{
+					ID:          1,
+					Title:       "Test",
+					Description: "Test",
+					StatusID:    1,
+					Date:        now,
+					Deleted:     false,
+					CreatedAt:   now,
+					DeletedAt:   time.Time{},
+				},
+				{
+					ID:          2,
+					Title:       "Test",
+					Description: "Test",
+					StatusID:    1,
+					Date:        now,
+					Deleted:     false,
+					CreatedAt:   now,
+					DeletedAt:   time.Time{},
+				},
+			},
+			expectedError: nil,
+		},
+		{
+			name:          "No rows in result set",
+			expectedTasks: []*entity.Task{},
+			expectedError: pgx.ErrNoRows,
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			mock, err := pgxmock.NewPool()
+			require.NoError(t, err)
+			defer mock.Close()
+
+			ctx := context.Background()
+
+			query := fmt.Sprintf(`
+				SELECT 
+				    id, 
+				    title, 
+				    description, 
+				    status_id, 
+				    date, 
+				    deleted, 
+				    created_at, 
+				    deleted_at
+				FROM %[1]s
+			`, constant.TasksTable)
+
+			columns := []string{"id", "title", "description", "status_id", "date", "deleted", "created_at", "deleted_at"}
+			rows := pgxmock.NewRows(columns)
+			for _, task := range tc.expectedTasks {
+				rows.AddRow(
+					task.ID,
+					task.Title,
+					task.Description,
+					task.StatusID,
+					task.Date,
+					task.Deleted,
+					task.CreatedAt,
+					task.DeletedAt,
+				)
+			}
+
+			if tc.expectedError == nil {
+				mock.ExpectQuery(regexp.QuoteMeta(query)).WithArgs().WillReturnRows(rows)
+			} else {
+				mock.ExpectQuery(regexp.QuoteMeta(query)).WithArgs().WillReturnError(tc.expectedError)
+			}
+
+			storage := NewTaskRepo(mock)
+
+			tasks, err := storage.GetAllTasks(ctx)
+			require.ErrorIs(t, err, tc.expectedError)
+			require.ElementsMatch(t, tc.expectedTasks, tasks)
+
+			require.NoError(t, mock.ExpectationsWereMet(), "there was unexpected result")
+		})
+	}
+}
+
 func TestTaskRepo_GetTaskByID(t *testing.T) {
 	now := time.Now().UTC()
 
