@@ -27,7 +27,7 @@ func newTaskRoutes(g *gin.RouterGroup, task service.Task, logger logger.Logger) 
 	g.DELETE("/:id", r.DeleteTaskByID)
 	g.PATCH("/:id", r.UpdateTaskByID)
 	g.GET("/:id", r.GetTaskByID)
-	g.GET("/", r.GetAllTasks)
+	g.GET("/", r.GetListTasks)
 }
 
 // CreateTask
@@ -103,7 +103,7 @@ func (r *taskRoutes) DeleteTaskByID(ctx *gin.Context) {
 //	@Description	Update task selected fields by its id.
 //	@UUID			202
 //	@Param			params	path		int									true	"Required task id for updating"
-//	@Param			params	body		taskservice.UpdateTaskByIDParams	true	"Required JSON body with necessary fields to update"
+//	@Param			params	body		taskservice.UpdateTaskByIDParams	false	"Required JSON body with necessary fields to update"
 //	@Success		200		{object}	nil									"Task was updated successfully"
 //	@Failure		400		{object}	response							"Invalid input data"
 //	@Failure		500		{object}	response							"Internal error"
@@ -143,7 +143,7 @@ func (r *taskRoutes) UpdateTaskByID(ctx *gin.Context) {
 //	@Description	Get task by its id.
 //	@UUID			203
 //	@Param			params	path		int										true	"Required task id for getting"
-//	@Success		200		{object}	taskservice.GetTaskWithStatusNameModel	"Task was gotten successfully"
+//	@Success		200		{object}	taskservice.GetTaskWithStatusNameModel	"Task was received successfully"
 //	@Failure		400		{object}	response								"Invalid input data"
 //	@Failure		500		{object}	response								"Internal error"
 //	@Router			/tasks/:id [get]
@@ -167,20 +167,29 @@ func (r *taskRoutes) GetTaskByID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 
-// GetAllTasks
+// GetListTasks
 //
-//	@Summary		Get all tasks
-//	@Description	Get all deleted and not deleted tasks.
+//	@Summary		Get tasks
+//	@Description	Get tasks with filtration by status name or date and pagination with limit.
 //	@UUID			204
-//	@Success		200	{object}	taskservice.GetAllTasksResponse	"Tasks were gotten successfully"
-//	@Failure		500	{object}	response						"Internal error"
+//	@Param			limit		query		int								false	"tasks limit on the page"
+//	@Param			last-id		query		int								false	"last task id for getting next page"
+//	@Param			status-name	query		string							false	"task status name for filtering"
+//	@Param			date		query		string							false	"date for getting task by date in RFC3339 format"
+//	@Success		200			{object}	taskservice.GetAllTasksResponse	"Tasks were gotten successfully"
+//	@Failure		500			{object}	response						"Internal error"
 //	@Router			/tasks/ [get]
 //	@Tags			Task
-func (r *taskRoutes) GetAllTasks(ctx *gin.Context) {
-	resp, err := r.task.GetAllTasks(ctx)
+func (r *taskRoutes) GetListTasks(ctx *gin.Context) {
+	limit := ctx.Query("limit")
+	lastID := ctx.Query("last-id")
+	statusName := ctx.Query("status-name")
+	date := ctx.Query("date")
+
+	resp, err := r.task.GetAllTasks(ctx, limit, lastID, statusName, date)
 	if err != nil {
-		r.logger.Error("error getting all tasks", zap.Error(err))
-		sentErrorResponse(ctx, http.StatusInternalServerError, "error getting all task", err)
+		r.logger.Error("error getting tasks", zap.Error(err))
+		sentErrorResponse(ctx, http.StatusInternalServerError, "error getting task", err)
 		return
 	}
 

@@ -12,7 +12,7 @@ import (
 
 type Task interface {
 	CreateTask(ctx context.Context, params taskservice.CreateTaskParams) (taskservice.CreateTaskResponse, error)
-	GetAllTasks(ctx context.Context) (taskservice.GetAllTasksResponse, error)
+	GetAllTasks(ctx context.Context, limitStr, lastIDStr, statusName, dateStr string) (taskservice.GetAllTasksResponse, error)
 	GetTaskByID(ctx context.Context, stringID string) (taskservice.GetTaskWithStatusNameModel, error)
 	UpdateTaskByID(ctx context.Context, stringID string, params taskservice.UpdateTaskByIDParams) error
 	DeleteTaskByID(ctx context.Context, stringID string) error

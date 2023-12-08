@@ -35,7 +35,7 @@ func (s *TaskService) CreateTask(ctx context.Context, params CreateTaskParams) (
 
 	params.Title = strings.TrimSpace(params.Title)
 	params.Description = strings.TrimSpace(params.Description)
-	params.StatusName = strings.TrimSpace(params.StatusName)
+	params.StatusName = strings.ToLower(strings.TrimSpace(params.StatusName))
 	params.Date = strings.TrimSpace(params.Date)
 
 	if params.Title == "" {
@@ -134,7 +134,7 @@ func (s *TaskService) UpdateTaskByID(ctx context.Context, stringID string, param
 
 	params.Title = strings.TrimSpace(params.Title)
 	params.Description = strings.TrimSpace(params.Description)
-	params.StatusName = strings.TrimSpace(params.StatusName)
+	params.StatusName = strings.ToLower(strings.TrimSpace(params.StatusName))
 	var status entity.Status
 	if params.StatusName != "" {
 		status, err = s.status.GetStatusByName(ctx, params.StatusName)
@@ -179,29 +179,79 @@ func (s *TaskService) UpdateTaskByID(ctx context.Context, stringID string, param
 	return nil
 }
 
-func (s *TaskService) GetAllTasks(ctx context.Context) (GetAllTasksResponse, error) {
+func (s *TaskService) GetAllTasks(ctx context.Context, limitStr, lastIDStr, statusName, dateStr string) (GetAllTasksResponse, error) {
 	var response GetAllTasksResponse
 
-	statuses, err := s.status.GetAllStatuses(ctx)
-	if err != nil {
-		s.logger.Error("error getting repo all statuses", zap.Error(err))
-		if errors.Is(err, pgx.ErrNoRows) {
-			return response, errors.New("statuses are not found")
+	var limit int
+	var err error
+	if limitStr != "" {
+		limit, err = strconv.Atoi(limitStr)
+		if err != nil {
+			s.logger.Error("error converting limit into int", zap.Error(err))
+			return response, constant.ErrInvalidLimit
 		}
-		return response, constant.ErrInternalError
+	}
+	if limit < 0 {
+		return response, constant.ErrNegativeLimit
 	}
 
-	mapStatuses := make(map[int]string, len(statuses))
-	for _, status := range statuses {
-		if status != nil {
-			mapStatuses[status.ID] = status.Name
-		} else {
-			s.logger.Error("error status is nil")
+	var lastID int
+	if lastIDStr != "" {
+		lastID, err = strconv.Atoi(lastIDStr)
+		if err != nil {
+			s.logger.Error("error converting last id into int", zap.Error(err))
+			return response, constant.ErrInvalidLastTaskID
+		}
+	}
+	if lastID < 0 {
+		return response, constant.ErrNegativeLastTaskID
+	}
+
+	var status entity.Status
+	var mapStatuses = make(map[int]string)
+	statusName = strings.ToLower(statusName)
+	if statusName != "" {
+		status, err = s.status.GetStatusByName(ctx, statusName)
+		if err != nil {
+			s.logger.Error("error getting repo status by name", zap.Error(err))
+			if errors.Is(err, pgx.ErrNoRows) {
+				return response, errors.New(fmt.Sprintf("status name '%s' is not found", statusName))
+			}
 			return response, constant.ErrInternalError
 		}
+	} else {
+		statuses, err := s.status.GetAllStatuses(ctx)
+		if err != nil {
+			s.logger.Error("error getting repo all statuses", zap.Error(err))
+			if errors.Is(err, pgx.ErrNoRows) {
+				return response, errors.New("statuses are not found")
+			}
+			return response, constant.ErrInternalError
+		}
+
+		mapStatuses = make(map[int]string, len(statuses))
+		for _, status := range statuses {
+			if status != nil {
+				mapStatuses[status.ID] = status.Name
+			} else {
+				s.logger.Error("error status is nil")
+				return response, constant.ErrInternalError
+			}
+		}
 	}
 
-	tasks, err := s.task.GetAllTasks(ctx)
+	var date time.Time
+	if dateStr != "" {
+		date, err = time.Parse(time.RFC3339, dateStr)
+		if err != nil {
+			s.logger.Error("error parsing date", zap.Error(err))
+			return response, constant.ErrInvalidDateFormat
+		}
+	}
+
+	date = date.UTC()
+
+	tasks, err := s.task.GetAllTasks(ctx, status.ID, limit, lastID, date)
 	if err != nil {
 		s.logger.Error("error getting repo all tasks", zap.Error(err))
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -213,14 +263,26 @@ func (s *TaskService) GetAllTasks(ctx context.Context) (GetAllTasksResponse, err
 	response.Tasks = make([]GetTaskWithStatusNameModel, 0, len(tasks))
 	taskWithStatusName := GetTaskWithStatusNameModel{}
 	for _, task := range tasks {
-		taskWithStatusName = GetTaskWithStatusNameModel{
-			ID:          task.ID,
-			Title:       task.Title,
-			Description: task.Description,
-			StatusName:  mapStatuses[task.StatusID],
-			Date:        task.Date.Format(time.RFC3339),
-			CreatedAt:   task.CreatedAt.Format(time.RFC3339),
+		if status.ID == 0 {
+			taskWithStatusName = GetTaskWithStatusNameModel{
+				ID:          task.ID,
+				Title:       task.Title,
+				Description: task.Description,
+				StatusName:  mapStatuses[task.StatusID],
+				Date:        task.Date.Format(time.RFC3339),
+				CreatedAt:   task.CreatedAt.Format(time.RFC3339),
+			}
+		} else {
+			taskWithStatusName = GetTaskWithStatusNameModel{
+				ID:          task.ID,
+				Title:       task.Title,
+				Description: task.Description,
+				StatusName:  status.Name,
+				Date:        task.Date.Format(time.RFC3339),
+				CreatedAt:   task.CreatedAt.Format(time.RFC3339),
+			}
 		}
+
 		response.Tasks = append(response.Tasks, taskWithStatusName)
 	}
 

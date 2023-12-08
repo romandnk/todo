@@ -11,6 +11,7 @@ package mock_storage
 import (
 	context "context"
 	reflect "reflect"
+	time "time"
 
 	entity "github.com/romandnk/todo/internal/entity"
 	gomock "go.uber.org/mock/gomock"
@@ -69,18 +70,18 @@ func (mr *MockTaskMockRecorder) DeleteTaskByID(ctx, id any) *gomock.Call {
 }
 
 // GetAllTasks mocks base method.
-func (m *MockTask) GetAllTasks(ctx context.Context) ([]*entity.Task, error) {
+func (m *MockTask) GetAllTasks(ctx context.Context, statusID, limit, lastID int, date time.Time) ([]*entity.Task, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAllTasks", ctx)
+	ret := m.ctrl.Call(m, "GetAllTasks", ctx, statusID, limit, lastID, date)
 	ret0, _ := ret[0].([]*entity.Task)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetAllTasks indicates an expected call of GetAllTasks.
-func (mr *MockTaskMockRecorder) GetAllTasks(ctx any) *gomock.Call {
+func (mr *MockTaskMockRecorder) GetAllTasks(ctx, statusID, limit, lastID, date any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllTasks", reflect.TypeOf((*MockTask)(nil).GetAllTasks), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllTasks", reflect.TypeOf((*MockTask)(nil).GetAllTasks), ctx, statusID, limit, lastID, date)
 }
 
 // GetTaskByID mocks base method.

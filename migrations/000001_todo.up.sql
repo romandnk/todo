@@ -22,6 +22,6 @@ CREATE INDEX idx_tasks_date ON tasks (date);
 
 INSERT INTO statuses (name)
 VALUES
-    ('Выполнено'),
-    ('Не выполнено');
+    ('выполнено'),
+    ('не выполнено');
 

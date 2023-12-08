@@ -64,11 +64,37 @@ const docTemplate = `{
         },
         "/tasks/": {
             "get": {
-                "description": "Get all deleted and not deleted tasks.",
+                "description": "Get tasks with filtration by status name or date and pagination with limit.",
                 "tags": [
                     "Task"
                 ],
-                "summary": "Get all tasks",
+                "summary": "Get tasks",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "tasks limit on the page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "last task id for getting next page",
+                        "name": "last-id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "task status name for filtering",
+                        "name": "status-name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "date for getting task by date in RFC3339 format",
+                        "name": "date",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Tasks were gotten successfully",
@@ -141,7 +167,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Task was gotten successfully",
+                        "description": "Task was received successfully",
                         "schema": {
                             "$ref": "#/definitions/taskservice.GetTaskWithStatusNameModel"
                         }
@@ -211,7 +237,6 @@ const docTemplate = `{
                         "description": "Required JSON body with necessary fields to update",
                         "name": "params",
                         "in": "body",
-                        "required": true,
                         "schema": {
                             "$ref": "#/definitions/taskservice.UpdateTaskByIDParams"
                         }
@@ -296,6 +321,9 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/taskservice.GetTaskWithStatusNameModel"
                     }
+                },
+                "total": {
+                    "type": "integer"
                 }
             }
         },
@@ -306,12 +334,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "date": {
-                    "type": "string"
-                },
-                "deleted": {
-                    "type": "boolean"
-                },
-                "deleted_at": {
                     "type": "string"
                 },
                 "description": {

@@ -42,9 +42,11 @@ func (r *TaskRepo) CreateTask(ctx context.Context, task entity.Task) (int, error
 	return id, nil
 }
 
-func (r *TaskRepo) GetAllTasks(ctx context.Context) ([]*entity.Task, error) {
+func (r *TaskRepo) GetAllTasks(ctx context.Context, statusID, limit, lastID int, date time.Time) ([]*entity.Task, error) {
 	var tasks []*entity.Task
 
+	values := make([]any, 0)
+	counter := 1
 	query := fmt.Sprintf(`
 		SELECT 
 		    id, 
@@ -57,7 +59,32 @@ func (r *TaskRepo) GetAllTasks(ctx context.Context) ([]*entity.Task, error) {
 		WHERE deleted=false
 	`, constant.TasksTable)
 
-	err := pgxscan.Select(ctx, r.db, &tasks, query)
+	if statusID != 0 {
+		query += fmt.Sprintf(" AND status_id=$%d", counter)
+		counter++
+		values = append(values, statusID)
+	}
+
+	if !date.IsZero() {
+		query += fmt.Sprintf(" AND date BETWEEN $%d AND $%d", counter, counter+1)
+		counter += 2
+		dateFrom := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, time.UTC)
+		dateTo := dateFrom.AddDate(0, 0, 1).Add(-time.Nanosecond)
+		values = append(values, dateFrom, dateTo)
+	}
+
+	query += fmt.Sprintf(" AND id>$%d", counter)
+	values = append(values, lastID)
+	counter++
+
+	query += fmt.Sprintf(" ORDER BY id")
+
+	if limit != 0 {
+		query += fmt.Sprintf(" LIMIT $%d", counter)
+		values = append(values, limit)
+	}
+
+	err := pgxscan.Select(ctx, r.db, &tasks, query, values...)
 	if err != nil {
 		return tasks, err
 	}

@@ -39,16 +39,14 @@ definitions:
         items:
           $ref: '#/definitions/taskservice.GetTaskWithStatusNameModel'
         type: array
+      total:
+        type: integer
     type: object
   taskservice.GetTaskWithStatusNameModel:
     properties:
       created_at:
         type: string
       date:
-        type: string
-      deleted:
-        type: boolean
-      deleted_at:
         type: string
       description:
         type: string
@@ -116,7 +114,25 @@ paths:
       - Status
   /tasks/:
     get:
-      description: Get all deleted and not deleted tasks.
+      description: Get tasks with filtration by status name or date and pagination
+        with limit.
+      parameters:
+      - description: tasks limit on the page
+        in: query
+        name: limit
+        type: integer
+      - description: last task id for getting next page
+        in: query
+        name: last-id
+        type: integer
+      - description: task status name for filtering
+        in: query
+        name: status-name
+        type: string
+      - description: date for getting task by date in RFC3339 format
+        in: query
+        name: date
+        type: string
       responses:
         "200":
           description: Tasks were gotten successfully
@@ -126,7 +142,7 @@ paths:
           description: Internal error
           schema:
             $ref: '#/definitions/v1.response'
-      summary: Get all tasks
+      summary: Get tasks
       tags:
       - Task
     post:
@@ -187,7 +203,7 @@ paths:
         type: integer
       responses:
         "200":
-          description: Task was gotten successfully
+          description: Task was received successfully
           schema:
             $ref: '#/definitions/taskservice.GetTaskWithStatusNameModel'
         "400":
@@ -212,7 +228,6 @@ paths:
       - description: Required JSON body with necessary fields to update
         in: body
         name: params
-        required: true
         schema:
           $ref: '#/definitions/taskservice.UpdateTaskByIDParams'
       responses:

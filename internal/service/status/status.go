@@ -28,7 +28,7 @@ func NewStatusService(status storage.Status, logger logger.Logger) *StatusServic
 func (s *StatusService) CreateStatus(ctx context.Context, params CreateStatusParams) (CreateStatusResponse, error) {
 	var response CreateStatusResponse
 
-	params.Name = strings.TrimSpace(params.Name)
+	params.Name = strings.ToLower(strings.TrimSpace(params.Name))
 
 	if params.Name == "" {
 		return response, constant.ErrEmptyStatusName

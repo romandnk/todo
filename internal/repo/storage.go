@@ -7,11 +7,12 @@ import (
 	"github.com/romandnk/todo/internal/entity"
 	postgresrepo "github.com/romandnk/todo/internal/repo/postgres"
 	postgres "github.com/romandnk/todo/pkg/storage"
+	"time"
 )
 
 type Task interface {
 	CreateTask(ctx context.Context, task entity.Task) (int, error)
-	GetAllTasks(ctx context.Context) ([]*entity.Task, error)
+	GetAllTasks(ctx context.Context, statusID, limit, lastID int, date time.Time) ([]*entity.Task, error)
 	GetTaskByID(ctx context.Context, id int) (entity.Task, error)
 	UpdateTaskByID(ctx context.Context, id int, task entity.Task) error
 	DeleteTaskByID(ctx context.Context, id int) error

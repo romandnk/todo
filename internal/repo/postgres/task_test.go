@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-func TestTaskRepo_CreateTask(t *testing.T) {
+func TestTaskRepoCreateTask(t *testing.T) {
 	mock, err := pgxmock.NewPool()
 	require.NoError(t, err)
 	defer mock.Close()
@@ -68,11 +68,42 @@ func TestTaskRepo_GetAllTasks(t *testing.T) {
 
 	testCases := []struct {
 		name          string
+		query         string
+		statusID      int
+		limit         int
+		lastID        int
+		date          time.Time
+		args          []any
 		expectedTasks []*entity.Task
 		expectedError error
 	}{
 		{
-			name: "OK",
+			name: "OK with all input data",
+			query: `
+				SELECT 
+		    		id, 
+		    		title, 
+		    		description, 
+		    		status_id, 
+		    		date,  
+		    		created_at
+				FROM tasks
+				WHERE deleted=false AND status_id=$1 AND date BETWEEN $2 AND $3 AND id>$4
+				ORDER BY id
+				LIMIT $5
+			`,
+			statusID: 1,
+			limit:    5,
+			lastID:   1,
+			date:     now,
+			args: []any{
+				1,
+				time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC),
+				time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC).
+					AddDate(0, 0, 1).Add(-time.Nanosecond),
+				1,
+				5,
+			},
 			expectedTasks: []*entity.Task{
 				{
 					ID:          1,
@@ -98,7 +129,116 @@ func TestTaskRepo_GetAllTasks(t *testing.T) {
 			expectedError: nil,
 		},
 		{
-			name:          "No rows in result set",
+			name: "OK with status id and date",
+			query: `
+				SELECT 
+		    		id, 
+		    		title, 
+		    		description, 
+		    		status_id, 
+		    		date,  
+		    		created_at
+				FROM tasks
+				WHERE deleted=false AND status_id=$1 AND date BETWEEN $2 AND $3 AND id>$4
+				ORDER BY id
+			`,
+			statusID: 1,
+			limit:    0,
+			lastID:   1,
+			date:     now,
+			args: []any{
+				1,
+				time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC),
+				time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC).
+					AddDate(0, 0, 1).Add(-time.Nanosecond),
+				1,
+			},
+			expectedTasks: []*entity.Task{
+				{
+					ID:          1,
+					Title:       "Test",
+					Description: "Test",
+					StatusID:    1,
+					Date:        now,
+					Deleted:     false,
+					CreatedAt:   now,
+					DeletedAt:   time.Time{},
+				},
+				{
+					ID:          2,
+					Title:       "Test",
+					Description: "Test",
+					StatusID:    1,
+					Date:        now,
+					Deleted:     false,
+					CreatedAt:   now,
+					DeletedAt:   time.Time{},
+				},
+			},
+			expectedError: nil,
+		},
+		{
+			name: "OK without input data",
+			query: `
+				SELECT 
+		    		id, 
+		    		title, 
+		    		description, 
+		    		status_id, 
+		    		date,  
+		    		created_at
+				FROM tasks
+				WHERE deleted=false AND id>$1
+				ORDER BY id
+			`,
+			statusID: 0,
+			limit:    0,
+			lastID:   0,
+			date:     time.Time{},
+			args:     []any{0},
+			expectedTasks: []*entity.Task{
+				{
+					ID:          1,
+					Title:       "Test",
+					Description: "Test",
+					StatusID:    1,
+					Date:        now,
+					Deleted:     false,
+					CreatedAt:   now,
+					DeletedAt:   time.Time{},
+				},
+				{
+					ID:          2,
+					Title:       "Test",
+					Description: "Test",
+					StatusID:    1,
+					Date:        now,
+					Deleted:     false,
+					CreatedAt:   now,
+					DeletedAt:   time.Time{},
+				},
+			},
+			expectedError: nil,
+		},
+		{
+			name: "No rows in result set",
+			query: `
+				SELECT 
+		    		id, 
+		    		title, 
+		    		description, 
+		    		status_id, 
+		    		date,  
+		    		created_at
+				FROM tasks
+				WHERE deleted=false AND id>$1
+				ORDER BY id
+			`,
+			statusID:      0,
+			limit:         0,
+			lastID:        0,
+			date:          time.Time{},
+			args:          []any{0},
 			expectedTasks: []*entity.Task{},
 			expectedError: pgx.ErrNoRows,
 		},
@@ -112,18 +252,6 @@ func TestTaskRepo_GetAllTasks(t *testing.T) {
 			defer mock.Close()
 
 			ctx := context.Background()
-
-			query := fmt.Sprintf(`
-				SELECT 
-		    		id, 
-		    		title, 
-		    		description, 
-		    		status_id, 
-		    		date,  
-		    		created_at
-				FROM %[1]s 
-				WHERE deleted=false
-			`, constant.TasksTable)
 
 			columns := []string{"id", "title", "description", "status_id", "date", "created_at"}
 			rows := pgxmock.NewRows(columns)
@@ -139,14 +267,14 @@ func TestTaskRepo_GetAllTasks(t *testing.T) {
 			}
 
 			if tc.expectedError == nil {
-				mock.ExpectQuery(regexp.QuoteMeta(query)).WithArgs().WillReturnRows(rows)
+				mock.ExpectQuery(regexp.QuoteMeta(tc.query)).WithArgs(tc.args...).WillReturnRows(rows)
 			} else {
-				mock.ExpectQuery(regexp.QuoteMeta(query)).WithArgs().WillReturnError(tc.expectedError)
+				mock.ExpectQuery(regexp.QuoteMeta(tc.query)).WithArgs(tc.args...).WillReturnError(tc.expectedError)
 			}
 
 			storage := NewTaskRepo(mock)
 
-			tasks, err := storage.GetAllTasks(ctx)
+			tasks, err := storage.GetAllTasks(ctx, tc.statusID, tc.limit, tc.lastID, tc.date)
 			require.ErrorIs(t, err, tc.expectedError)
 			require.ElementsMatch(t, tc.expectedTasks, tasks)
 

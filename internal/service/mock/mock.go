@@ -70,18 +70,18 @@ func (mr *MockTaskMockRecorder) DeleteTaskByID(ctx, stringID any) *gomock.Call {
 }
 
 // GetAllTasks mocks base method.
-func (m *MockTask) GetAllTasks(ctx context.Context) (taskservice.GetAllTasksResponse, error) {
+func (m *MockTask) GetAllTasks(ctx context.Context, limitStr, lastIDStr, statusName, dateStr string) (taskservice.GetAllTasksResponse, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAllTasks", ctx)
+	ret := m.ctrl.Call(m, "GetAllTasks", ctx, limitStr, lastIDStr, statusName, dateStr)
 	ret0, _ := ret[0].(taskservice.GetAllTasksResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetAllTasks indicates an expected call of GetAllTasks.
-func (mr *MockTaskMockRecorder) GetAllTasks(ctx any) *gomock.Call {
+func (mr *MockTaskMockRecorder) GetAllTasks(ctx, limitStr, lastIDStr, statusName, dateStr any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllTasks", reflect.TypeOf((*MockTask)(nil).GetAllTasks), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllTasks", reflect.TypeOf((*MockTask)(nil).GetAllTasks), ctx, limitStr, lastIDStr, statusName, dateStr)
 }
 
 // GetTaskByID mocks base method.
