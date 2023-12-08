@@ -53,7 +53,7 @@ func (r *TaskRepo) GetTaskByID(ctx context.Context, id int) (entity.Task, error)
 		    deleted_at
 		FROM %[1]s
 		WHERE id=$1
-	`, constant.TasksTable, constant.StatusesTable)
+	`, constant.TasksTable)
 
 	err := pgxscan.Get(ctx, r.db, &task, query, id)
 	if err != nil {
@@ -62,6 +62,31 @@ func (r *TaskRepo) GetTaskByID(ctx context.Context, id int) (entity.Task, error)
 
 	return task, nil
 }
+
+//func (r *TaskRepo) GetTasksByStatusID(ctx context.Context, statusID int, taskID, date, limit int) ([]*entity.Task, error) {
+//	var tasks []*entity.Task
+//
+//	query := fmt.Sprintf(`
+//		SELECT
+//		    id,
+//		    title,
+//		    description,
+//		    status_id,
+//		    date,
+//		    deleted,
+//		    created_at,
+//		    deleted_at
+//		FROM %[1]s
+//		WHERE status_id=$1
+//	`, constant.TasksTable)
+//
+//	err := pgxscan.Select(ctx, r.db, &tasks, query, id)
+//	if err != nil {
+//		return task, err
+//	}
+//
+//	return task, nil
+//}
 
 func (r *TaskRepo) UpdateTaskByID(ctx context.Context, id int, task entity.Task) error {
 	newTask := utils.CheckEmptyTaskFields(task)

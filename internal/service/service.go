@@ -1,5 +1,7 @@
 package service
 
+//go:generate mockgen -source=service.go -destination=mock/mock.go service
+
 import (
 	"context"
 	storage "github.com/romandnk/todo/internal/repo"

@@ -4,3 +4,6 @@ run:
 stop:
 	docker compose -f ./deployment/docker-compose.yml down && \
 	docker volume rm todo_postgres
+
+test:
+	go test -race ./internal/...
