@@ -228,6 +228,8 @@ func (s *TaskService) GetAllTasks(ctx context.Context) (GetAllTasksResponse, err
 		response.Tasks = append(response.Tasks, taskWithStatusName)
 	}
 
+	response.Total = len(response.Tasks)
+
 	return response, nil
 }
 

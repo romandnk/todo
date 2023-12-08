@@ -22,14 +22,18 @@ func (r *StatusRepo) CreateStatus(ctx context.Context, status entity.Status) (in
 	var id int
 
 	values := []any{status.Name}
+	placeholderString, err := utils.SetPlaceholders(constant.PlaceholderDollar, len(values))
+	if err != nil {
+		return id, err
+	}
 	query := fmt.Sprintf(`
 		INSERT INTO %[1]s
 		(name)
 		VALUES %[2]s
 		RETURNING id
-	`, constant.StatusesTable, utils.SetPlaceholders(constant.PlaceholderDollar, len(values)))
+	`, constant.StatusesTable, placeholderString)
 
-	err := pgxscan.Get(ctx, r.db, &id, query, values...)
+	err = pgxscan.Get(ctx, r.db, &id, query, values...)
 	if err != nil {
 		return id, err
 	}

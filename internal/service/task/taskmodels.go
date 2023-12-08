@@ -30,5 +30,6 @@ type GetTaskWithStatusNameModel struct {
 }
 
 type GetAllTasksResponse struct {
-	Tasks []GetTaskWithStatusNameModel `json:"tasks"`
+	Total int                          `json:"total"`
+	Tasks []GetTaskWithStatusNameModel `json:"tasks" json:"tasks"`
 }

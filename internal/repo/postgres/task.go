@@ -23,14 +23,18 @@ func (r *TaskRepo) CreateTask(ctx context.Context, task entity.Task) (int, error
 	var id int
 
 	values := []any{task.Title, task.Description, task.StatusID, task.Date, task.Deleted, task.CreatedAt, task.DeletedAt}
+	placeholderString, err := utils.SetPlaceholders(constant.PlaceholderDollar, len(values))
+	if err != nil {
+		return id, err
+	}
 	query := fmt.Sprintf(`
 		INSERT INTO %[1]s
 		(title, description, status_id, date, deleted, created_at, deleted_at)
 		VALUES %[2]s
 		RETURNING id
-	`, constant.TasksTable, utils.SetPlaceholders(constant.PlaceholderDollar, len(values)))
+	`, constant.TasksTable, placeholderString)
 
-	err := pgxscan.Get(ctx, r.db, &id, query, values...)
+	err = pgxscan.Get(ctx, r.db, &id, query, values...)
 	if err != nil {
 		return id, err
 	}

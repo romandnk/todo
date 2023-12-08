@@ -3,13 +3,22 @@ package utils
 import (
 	"database/sql"
 	"fmt"
+	"github.com/romandnk/todo/internal/constant"
 	"github.com/romandnk/todo/internal/entity"
 	"strings"
 )
 
 // SetPlaceholders return string with defined quantity selected placeholders
-func SetPlaceholders(placeholder string, quantity int) string {
+func SetPlaceholders(placeholder string, quantity int) (string, error) {
 	var result strings.Builder
+
+	if placeholder == "" {
+		return "", constant.ErrEmptyPlaceholder
+	}
+
+	if quantity <= 0 {
+		return "", constant.ErrNonPositiveQuantity
+	}
 
 	result.WriteString("(")
 
@@ -20,7 +29,7 @@ func SetPlaceholders(placeholder string, quantity int) string {
 	result.WriteString(fmt.Sprintf("%s%d", placeholder, quantity))
 	result.WriteString(")")
 
-	return result.String()
+	return result.String(), nil
 }
 
 type TaskToUpdate struct {
