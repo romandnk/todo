@@ -11,12 +11,12 @@ import (
 
 type Handler struct {
 	engine   *gin.Engine
-	services service.Services
+	services *service.Services
 	logger   logger.Logger
 	mw       *MW
 }
 
-func NewHandler(services service.Services, logger logger.Logger, mw *MW) *Handler {
+func NewHandler(services *service.Services, logger logger.Logger, mw *MW) *Handler {
 	return &Handler{
 		services: services,
 		logger:   logger,
@@ -37,13 +37,13 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		// status management group
 		statuses := api.Group("/statuses")
 		{
-			newStatusRoutes(statuses, h.services, h.logger)
+			newStatusRoutes(statuses, h.services.Status, h.logger)
 		}
 
 		// task management group
 		tasks := api.Group("tasks")
 		{
-			newTaskRoutes(tasks, h.services, h.logger)
+			newTaskRoutes(tasks, h.services.Task, h.logger)
 		}
 	}
 
