@@ -45,7 +45,7 @@ func (r *taskRoutes) CreateTask(ctx *gin.Context) {
 	var params taskservice.CreateTaskParams
 
 	if err := ctx.ShouldBindJSON(&params); err != nil {
-		r.logger.Error("error binding json body", zap.Error(err))
+		r.logger.Error("error binding json body", zap.String("error", err.Error()))
 		sentErrorResponse(ctx, http.StatusBadRequest, "error binding json body", err)
 		return
 	}

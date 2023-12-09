@@ -10,6 +10,7 @@ import (
 	mock_logger "github.com/romandnk/todo/pkg/logger/mock"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
+	"go.uber.org/zap"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -18,24 +19,33 @@ import (
 func TestTaskRoutes_CreateTask(t *testing.T) {
 	url := "/api/v1/tasks"
 
-	type args struct {
+	type argsTask struct {
 		input         taskservice.CreateTaskParams
 		output        taskservice.CreateTaskResponse
 		expectedError error
 	}
 
-	type mockBehaviour func(m *mock_service.MockTask, args args)
+	type argsLogger struct {
+		msg    string
+		fields []any
+	}
+
+	type mockTaskBehaviour func(m *mock_service.MockTask, args argsTask)
+	type mockLoggerBehaviour func(m *mock_logger.MockLogger, args argsLogger)
 
 	testCases := []struct {
 		name                 string
-		args                 args
-		m                    mockBehaviour
+		argsTask             argsTask
+		argsLogger           argsLogger
+		taskM                mockTaskBehaviour
+		loggerM              mockLoggerBehaviour
 		requestBody          map[string]interface{}
-		expectedResponseBody map[string]interface{}
+		expectedResponseBody string
+		expectedHTTPCode     int
 	}{
 		{
 			name: "OK",
-			args: args{
+			argsTask: argsTask{
 				input: taskservice.CreateTaskParams{
 					Title:       "Test",
 					Description: "Test",
@@ -44,7 +54,7 @@ func TestTaskRoutes_CreateTask(t *testing.T) {
 				},
 				output: taskservice.CreateTaskResponse{ID: 1},
 			},
-			m: func(m *mock_service.MockTask, args args) {
+			taskM: func(m *mock_service.MockTask, args argsTask) {
 				m.EXPECT().CreateTask(gomock.Any(), args.input).Return(args.output, args.expectedError)
 			},
 			requestBody: map[string]interface{}{
@@ -53,9 +63,25 @@ func TestTaskRoutes_CreateTask(t *testing.T) {
 				"status_name": "done",
 				"date":        "2024-12-07T20:49:18Z",
 			},
-			expectedResponseBody: map[string]interface{}{
-				"id": 1,
+			expectedResponseBody: `{"id":1}`,
+			expectedHTTPCode:     http.StatusCreated,
+		},
+		{
+			name: "error validating json body fields (empty title)",
+			argsLogger: argsLogger{
+				msg:    "error binding json body",
+				fields: []any{zap.String("error", "Key: 'CreateTaskParams.Title' Error:Field validation for 'Title' failed on the 'required' tag")},
 			},
+			loggerM: func(m *mock_logger.MockLogger, args argsLogger) {
+				m.EXPECT().Error(args.msg, args.fields)
+			},
+			requestBody: map[string]interface{}{
+				"description": "Test",
+				"status_name": "done",
+				"date":        "2024-12-07T20:49:18Z",
+			},
+			expectedResponseBody: `{"message":"error binding json body","error":"Key: 'CreateTaskParams.Title' Error:Field validation for 'Title' failed on the 'required' tag"}`,
+			expectedHTTPCode:     http.StatusBadRequest,
 		},
 	}
 
@@ -63,11 +89,18 @@ func TestTaskRoutes_CreateTask(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
 
 			taskService := mock_service.NewMockTask(ctrl)
 			logger := mock_logger.NewMockLogger(ctrl)
 
-			tc.m(taskService, tc.args)
+			if tc.taskM != nil {
+				tc.taskM(taskService, tc.argsTask)
+			}
+
+			if tc.loggerM != nil {
+				tc.loggerM(logger, tc.argsLogger)
+			}
 
 			taskR := taskRoutes{
 				task:   taskService,
@@ -89,12 +122,9 @@ func TestTaskRoutes_CreateTask(t *testing.T) {
 
 			r.ServeHTTP(w, req)
 
-			require.Equal(t, http.StatusCreated, w.Code)
+			require.Equal(t, tc.expectedHTTPCode, w.Code)
 
-			expectedResponseBody, err := json.Marshal(tc.expectedResponseBody)
-			require.NoError(t, err)
-
-			require.Equal(t, []byte(expectedResponseBody), w.Body.Bytes())
+			require.Equal(t, []byte(tc.expectedResponseBody), w.Body.Bytes())
 		})
 	}
 }
